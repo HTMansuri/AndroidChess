@@ -7,6 +7,8 @@ package com.example.myapplication;
  */
 public abstract class Board 
 {
+    public int pieceCount;
+
     /**
      * This is the default constructor for the Board class.
      */
@@ -14,7 +16,17 @@ public abstract class Board
     {
     	
     }
-    
+
+//    public int getPieceCount()
+//    {
+//        return pieceCount;
+//    }
+//    public void setPieceCount(int pC)
+//    {
+//        pieceCount = pC;
+//    }
+
+    public abstract String getUIName();
     
     /**
      * This is an abstract method that should be implemented to make a move on the board.

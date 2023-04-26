@@ -19,10 +19,19 @@ public class Rook extends Board
 	/**
      * Constructs a new Rook object with default values.
      */
-	public Rook()
+	public Rook(int pC)
 	{
 		color="";
 		name = "R";
+		pieceCount=pC;
+	}
+
+	public String getUIName()
+	{
+		if(color.equals("b"))
+			return "blackrook" + pieceCount;
+		else
+			return "whiterook" + pieceCount;
 	}
 	
 	/**
@@ -110,7 +119,7 @@ public class Rook extends Board
      */
 	public Board move(Board obj)
 	{
-		obj = new Rook();
+		obj = new Rook(pieceCount);
 		obj.setColor(this.getColor());
 		obj.setName(this.getName());
 		return obj;

@@ -65,7 +65,7 @@
         app:srcCompat="@drawable/blackqueen" />
 
     <ImageView
-        android:id="@+id/blackking1"
+        android:id="@+id/blackking"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="160dp"
@@ -286,16 +286,6 @@
         app:srcCompat="@drawable/whitepawn" />
 
     <ImageView
-        android:id="@+id/empty1"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="200dp"
-        android:contentDescription="empty1"
-        app:layout_constraintStart_toStartOf="@+id/board"
-        app:layout_constraintTop_toTopOf="@+id/board" />
-
-    <ImageView
         android:id="@+id/whiterook1"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -340,7 +330,7 @@
         app:srcCompat="@drawable/whitequeen" />
 
     <ImageView
-        android:id="@+id/whiteking1"
+        android:id="@+id/whiteking"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="160dp"

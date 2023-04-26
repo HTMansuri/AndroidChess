@@ -19,10 +19,19 @@ public class Bishop extends Board
 	/**
      * Constructs a new Bishop object with default values.
      */
-	public Bishop()
+	public Bishop(int pC)
 	{
 		color="";
 		name="B";
+		pieceCount=pC;
+	}
+
+	public String getUIName()
+	{
+		if(color.equals("b"))
+			return "blackbishop" + pieceCount;
+		else
+			return "whitebishop" + pieceCount;
 	}
 	
 	/**
@@ -116,7 +125,7 @@ public class Bishop extends Board
      */
 	public Board move(Board obj)
 	{
-		obj = new Bishop();
+		obj = new Bishop(pieceCount);
 		obj.setColor(this.getColor());
 		obj.setName(this.getName());
 		return obj;

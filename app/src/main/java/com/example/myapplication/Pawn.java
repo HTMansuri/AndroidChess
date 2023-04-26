@@ -32,10 +32,19 @@ public class Pawn extends Board
     /**
      * Creates a new Pawn object with default values for color and name.
      */
-	public Pawn()
+	public Pawn(int pC)
 	{
 		color="";
 		name="p";
+		pieceCount=pC;
+	}
+
+	public String getUIName()
+	{
+		if(color.equals("b"))
+			return "blackpawn" + pieceCount;
+		else
+			return "whitepawn" + pieceCount;
 	}
 	
 	/**
@@ -126,7 +135,7 @@ public class Pawn extends Board
 	 */
 	public Board move(Board obj)
 	{
-		obj = new Pawn();
+		obj = new Pawn(pieceCount);
 		obj.setColor(this.getColor());
 		obj.setName(this.getName());
 		return obj;

@@ -21,10 +21,19 @@ public class Knight extends Board
 	/**
      * Creates a new Knight object with default values for color and name.
      */
-	public Knight()
+	public Knight(int pC)
     {
         color = "";
         name = "N";
+        pieceCount=pC;
+    }
+
+    public String getUIName()
+    {
+        if(color.equals("b"))
+            return "blackknight" + pieceCount;
+        else
+            return "whiteknight" + pieceCount;
     }
     
     /**
@@ -53,7 +62,7 @@ public class Knight extends Board
 	 */
 	public Board move(Board obj)
     {
-        obj = new Knight();
+        obj = new Knight(pieceCount);
         obj.setColor(this.getColor());
         obj.setName(this.getName());
         return obj;

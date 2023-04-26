@@ -46,6 +46,14 @@ public class King extends Board
 		color="";
 		name="K";
 	}
+
+	public String getUIName()
+	{
+		if(color.equals("b"))
+			return "blackking";
+		else
+			return "whiteking";
+	}
 	
 	/**
      * Checks if a move from the initial position to the final position of the king is valid.

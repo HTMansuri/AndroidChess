@@ -19,10 +19,19 @@ public class Queen extends Board
 	/**
      * Constructs a new Queen object with default values.
      */
-	public Queen()
+	public Queen(int pC)
 	{
 		color="";
 		name="Q";
+		pieceCount=pC;
+	}
+
+	public String getUIName()
+	{
+		if(color.equals("b"))
+			return "blackqueen" + pieceCount;
+		else
+			return "whitequeen" + pieceCount;
 	}
 	
 	/**
@@ -40,8 +49,8 @@ public class Queen extends Board
 	{
 		boolean status = false;
 		
-		Rook r = new Rook();
-		Bishop b = new Bishop();
+		Rook r = new Rook(0);
+		Bishop b = new Bishop(0);
 		
 		status = r.isValid(board, initiali, initialj, finali, finalj);
 		if(!status)
@@ -58,7 +67,7 @@ public class Queen extends Board
      */
 	public Board move(Board obj)
 	{
-		obj = new Queen();
+		obj = new Queen(pieceCount);
 		obj.setColor(this.getColor());
 		obj.setName(this.getName());
 		return obj;
