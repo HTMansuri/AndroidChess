@@ -5,6 +5,7 @@ import android.graphics.drawable.*;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.view.*;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -14,6 +15,17 @@ public class PlayActivity extends AppCompatActivity
     Board[][] chessboard = new Board[8][8];
     ImageView initialImageView, finalImageView, board;
     int initialrow, initialcol, clickCount = 0;
+    TextView turnTV, messageTV;
+
+    String color = "";
+    int turn = 0;
+    boolean status = true;
+    int bchecki = 7;
+    int bcheckj = 4;
+    int wchecki = 0;
+    int wcheckj = 4;
+    boolean check = false;
+    boolean checkMate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -21,10 +33,14 @@ public class PlayActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+        turnTV = findViewById(R.id.turn);
+        messageTV = findViewById(R.id.message);
         board = findViewById(R.id.board);
         board.setOnTouchListener(onTouchListener);
 
         Chess.initChessBoard(chessboard);
+        //debug
+        Chess.displayChessBoard(chessboard);
     }
 
     View.OnTouchListener onTouchListener = new View.OnTouchListener()
@@ -36,11 +52,34 @@ public class PlayActivity extends AppCompatActivity
             int row = (int) event.getY()/sqsize;
             int col = (int) event.getX()/sqsize;
 
+            //Determine turn
+            if(turn%2 != 0)
+            {
+                color = "b";
+                turnTV.setText("Black's Move");
+            }
+            else
+            {
+                color = "w";
+                turnTV.setText("White's Move");
+            }
+
             switch(event.getAction())
             {
                 case MotionEvent.ACTION_DOWN:
                 {
-                    if(clickCount == 0 && (chessboard[row][col] instanceof Bishop || chessboard[row][col] instanceof King || chessboard[row][col] instanceof Knight || chessboard[row][col] instanceof Pawn || chessboard[row][col] instanceof Queen || chessboard[row][col] instanceof Rook))
+                    if(initialImageView != null && chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
+                    {
+                        initialImageView.setBackground(null);
+                        initialImageView = null;
+                        clickCount = 0;
+                    }
+
+                    if(clickCount == 0 && initialImageView == null
+                        && (chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
+                        && (chessboard[row][col] instanceof Bishop || chessboard[row][col] instanceof King
+                        || chessboard[row][col] instanceof Knight || chessboard[row][col] instanceof Pawn
+                        || chessboard[row][col] instanceof Queen || chessboard[row][col] instanceof Rook))
                     {
                         clickCount++;
 
@@ -48,6 +87,7 @@ public class PlayActivity extends AppCompatActivity
                         initialcol = col;
 
                         String name = chessboard[initialrow][initialcol].getUIName();
+
                         int id = getResources().getIdentifier(name, "id", getPackageName());
                         initialImageView = findViewById(id);
 
@@ -57,7 +97,7 @@ public class PlayActivity extends AppCompatActivity
                         border.setColor(Color.TRANSPARENT);
                         initialImageView.setBackground(border);
                     }
-                    else if(clickCount == 1)
+                    else if(clickCount == 1 && ((chessboard[row][col] != null && !chessboard[row][col].getColor().equals(color)) || chessboard[row][col] == null))
                     {
                         clickCount = 0;
                         initialImageView.setBackground(null);
@@ -82,14 +122,31 @@ public class PlayActivity extends AppCompatActivity
                             ConstraintLayout playLayout = findViewById(R.id.playLayout);
                             playLayout.addView(initialImageView, params);
                             chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
+                            chessboard[initialrow][initialcol] = null;
+                            turn++;
+                            initialImageView = finalImageView = null;
+
+                            //debug
+                            Chess.displayChessBoard(chessboard);
+                        }
+                        else
+                        {
+                            initialImageView = null;
                         }
                     }
                     else
+                    {
                         clickCount = 0;
+                        if(initialImageView != null)
+                        initialImageView.setBackground(null);
+                        initialImageView = null;
+                    }
                     return true;
                 }
                 default:
+                {
                     return false;
+                }
             }
         }
     };

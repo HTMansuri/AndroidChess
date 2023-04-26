@@ -12,45 +12,17 @@ public class Chess
 {
 //	public static void main(String[] args) throws FileNotFoundException
 //	{
-//		/**
-//		 * Stores the input given by the user.
-//		 */
-//		String input = "";
-//		/**
-//		 * Stores the color of the piece.
-//		 */
 //		String color = "";
-//		/**
-//		 * Determines whose turn to play.
-//		 */
 //		int turn = 0;
-//		/**
-//		 * Status is true if a player plays a valid move.
-//		 */
 //		boolean status = true;
-//		/**
-//		 * Keeps track of where the Black King is on the chess board.
-//		 */
 //		int bchecki = 7;
 //		int bcheckj = 4;
-//		/**
-//		 * Keeps track of where the White King is on the chess board.
-//		 */
 //		int wchecki = 0;
 //		int wcheckj = 4;
-//
-//		/**
-//		 * Variables that keep track of check and checkmate.
-//		 */
 //		boolean check = false;
 //		boolean checkPrint1 = false;
 //		boolean checkMate = false;
-//
-//		Scanner kb = new Scanner(System.in);
-//
-//		/**
-//		 * Initialize initial chess board
-//		 */
+
 //		Board[][] board = new Board[8][8];
 //		initChessBoard(board);
 //
@@ -675,44 +647,57 @@ public class Chess
 //     *
 //     * @param board the chess board as a 2D array of Board objects
 //     */
-//	public static void displayChessBoard(Board[][] board)
-//	{
-//		int vertIndex = 9;
-//		char horiIndex = 'a';
-//		for(int i=7; i>=0; i--)
-//		{
-//			for(int j=0; j<8; j++)
-//			{
-//				if(board[i][j] != null)
-//				{
-//					StringBuilder name = new StringBuilder("");
-//					name.append(board[i][j].getColor());
-//					name.append(board[i][j].getName());
-//					System.out.print(name + " ");
-//				}
-//				else if((i%2 == 0 && j%2 != 0) || (i%2 != 0 && j%2 == 0))
-//				{
-//					System.out.print("## ");
-//				}
-//				else
-//				{
-//					System.out.print("   ");
-//				}
-//			}
-//			vertIndex--;
-//			System.out.println(vertIndex);
-//		}
-//		while(horiIndex != 'i')
-//		{
-//			if(horiIndex == 'a')
-//			{
-//				System.out.print(" " + horiIndex);
-//			}
-//			else
-//			{
-//				System.out.print("  " + horiIndex);
-//			}
-//			horiIndex++;
-//		}
-//	}
+	public static void displayChessBoard(Board[][] board)
+	{
+		int vertIndex = 9;
+		char horiIndex = 'a';
+		for(int i=0; i<=7; i++)
+		{
+			for(int j=0; j<=7; j++)
+			{
+				if(board[i][j] != null)
+				{
+					StringBuilder name = new StringBuilder("");
+					name.append(board[i][j].getColor());
+					name.append(board[i][j].getName());
+					System.out.print(name + " ");
+				}
+				else if((i%2 == 0 && j%2 != 0) || (i%2 != 0 && j%2 == 0))
+				{
+					System.out.print("## ");
+				}
+				else
+				{
+					System.out.print("   ");
+				}
+			}
+			vertIndex--;
+			System.out.println(vertIndex);
+		}
+		while(horiIndex != 'i')
+		{
+			if(horiIndex == 'a')
+			{
+				System.out.print(" " + horiIndex);
+			}
+			else
+			{
+				System.out.print("  " + horiIndex);
+			}
+			horiIndex++;
+		}
+	}
 }
+
+/*
+
+00 01 02 03 04 05 06 07
+10 11 12 13 14 15 16 17
+20 21 22 23 24 25 26 27
+30 31 32 33 34 35 36 37
+40 41 42 43 44 45 46 47
+50 51 52 53 54 55 56 57
+60 61 62 63 64 65 66 67
+70 71 72 73 74 75 76 77
+
+ */

@@ -58,9 +58,11 @@ public class Pawn extends Board
 	 */
 	public boolean isValid(Board[][] board, int initiali, int initialj, int finali, int finalj)
 	{
-		if(this.getColor().equals("w")) {
-			int iChange = finali-initiali;
-			int jChange = finalj-initialj;
+		int iChange = finali-initiali;
+		int jChange = finalj-initialj;
+		//System.out.println(iChange);
+		//System.out.println(jChange);
+		if(this.getColor().equals("b")) {
 			if(iChange==1 || iChange==2) {
 				if((iChange==1 && jChange == 0)) {
 					if((board[finali][finalj] == null)) {
@@ -72,16 +74,16 @@ public class Pawn extends Board
 				else if((iChange==2 && jChange == 0) && initiali==1) {
 					if((board[initiali+1][initialj] == null) && (board[finali][finalj] == null))
 						{
-							if((finalj-1>=0 && board[finali][finalj-1] != null && board[finali][finalj-1].getName().equals("p") && board[finali][finalj-1].getColor().equals("b"))||(finalj+1<8 && board[finali][finalj+1] != null && board[finali][finalj+1].getName().equals("p") && board[finali][finalj+1].getColor().equals("b")))
+							if((finalj-1>=0 && board[finali][finalj-1] != null && board[finali][finalj-1].getName().equals("p") && board[finali][finalj-1].getColor().equals("w"))||(finalj+1<8 && board[finali][finalj+1] != null && board[finali][finalj+1].getName().equals("p") && board[finali][finalj+1].getColor().equals("w")))
 								{
-									enPassantPos = String.valueOf(finali)+String.valueOf(finalj);
+									enPassantPos = finali +String.valueOf(finalj);
 									enPassant = true;
 								}
 							return true;
 						}
 				}
 				else if((iChange==1 && jChange == 1) || (iChange==1 && jChange == -1)) {
-					if((board[finali][finalj] != null) && (board[finali][finalj].getColor()=="b"))
+					if((board[finali][finalj] != null) && (board[finali][finalj].getColor()=="w"))
 						{
 							return true;
 						}
@@ -91,11 +93,8 @@ public class Pawn extends Board
 					}
 				}
 			}
-			return false;
 		}
 		else {
-			int iChange = finali-initiali;
-			int jChange = finalj-initialj;
 			if(iChange==-1 || iChange==-2) {
 				if((iChange==-1 && jChange == 0)) {
 					if((board[finali][finalj] == null)) {
@@ -105,16 +104,16 @@ public class Pawn extends Board
 				else if((iChange==-2 && jChange == 0) && initiali==6) {
 					if((board[initiali-1][initialj] == null) && (board[finali][finalj] == null))
 					{
-						if((finalj-1>=0 && board[finali][finalj-1] != null && board[finali][finalj-1].getName().equals("p") && board[finali][finalj-1].getColor().equals("w"))||(finalj+1<8 && board[finali][finalj+1] != null && board[finali][finalj+1].getName().equals("p") && board[finali][finalj+1].getColor().equals("w")))
+						if((finalj-1>=0 && board[finali][finalj-1] != null && board[finali][finalj-1].getName().equals("p") && board[finali][finalj-1].getColor().equals("b"))||(finalj+1<8 && board[finali][finalj+1] != null && board[finali][finalj+1].getName().equals("p") && board[finali][finalj+1].getColor().equals("b")))
 						{
-							enPassantPos = String.valueOf(finali)+String.valueOf(finalj);
+							enPassantPos = finali +String.valueOf(finalj);
 							enPassant = true;
 						}
 						return true;
 					}
 				}
 				else if((iChange==-1 && jChange == -1) || (iChange==-1 && jChange == 1)) {
-					if((board[finali][finalj] != null) && (board[finali][finalj].getColor()=="w"))
+					if((board[finali][finalj] != null) && (board[finali][finalj].getColor()=="b"))
 						{
 							return true;
 						}
@@ -124,8 +123,8 @@ public class Pawn extends Board
 					}
 				}
 			}
-			return false;
-			}
+		}
+		return false;
 	}
 	
 	/**
