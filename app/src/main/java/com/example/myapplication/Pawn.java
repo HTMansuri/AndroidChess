@@ -60,8 +60,6 @@ public class Pawn extends Board
 	{
 		int iChange = finali-initiali;
 		int jChange = finalj-initialj;
-		//System.out.println(iChange);
-		//System.out.println(jChange);
 		if(this.getColor().equals("b")) {
 			if(iChange==1 || iChange==2) {
 				if((iChange==1 && jChange == 0)) {

@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.Bundle;
@@ -24,6 +25,8 @@ public class PlayActivity extends AppCompatActivity
     int bcheckj = 4;
     int wchecki = 0;
     int wcheckj = 4;
+    int queenblackPromo = 3;
+    int queenwhitePromo = 3;
     boolean check = false;
     boolean checkMate = false;
 
@@ -89,6 +92,8 @@ public class PlayActivity extends AppCompatActivity
                         initialcol = col;
 
                         String name = chessboard[initialrow][initialcol].getUIName();
+                        //debug
+                        System.out.println(name);
 
                         int id = getResources().getIdentifier(name, "id", getPackageName());
                         initialImageView = findViewById(id);
@@ -157,6 +162,33 @@ public class PlayActivity extends AppCompatActivity
                                 playLayout.addView(temp, params);
                             }
 
+                            //promotion - default is Queen
+                            if((row==7 && chessboard[initialrow][initialcol].getName()=="p") || (row==0 && chessboard[initialrow][initialcol].getName()=="p"))
+                            {
+                                params = (ConstraintLayout.LayoutParams) initialImageView.getLayoutParams();
+                                params.leftMargin = col * sqsize;
+                                params.topMargin = row * sqsize;
+                                Resources res = v.getContext().getResources();
+                                int id = 0;
+                                //Performs promotion of pawn
+                                if(color.equals("b"))
+                                {
+                                    chessboard[row][col] = new Queen(queenblackPromo);
+                                    initialImageView.setImageResource(R.drawable.blackqueen);
+                                    id = res.getIdentifier("blackqueen"+queenblackPromo++, "id", v.getContext().getPackageName());
+                                }
+                                else
+                                {
+                                    chessboard[row][col] = new Queen(queenwhitePromo++);
+                                    initialImageView.setImageResource(R.drawable.whitequeen);
+                                    id = res.getIdentifier("whitequeen"+queenblackPromo++, "id", v.getContext().getPackageName());
+                                }
+                                chessboard[row][col].setColor(color);
+                                chessboard[initialrow][initialcol] = null;
+                                initialImageView.setId(id);
+                                initialImageView.setLayoutParams(params);
+                            }
+
                             chessboard[initialrow][initialcol] = null;
                             turn++;
                             initialImageView = finalImageView = null;
@@ -174,7 +206,7 @@ public class PlayActivity extends AppCompatActivity
                     {
                         clickCount = 0;
                         if(initialImageView != null)
-                        initialImageView.setBackground(null);
+                            initialImageView.setBackground(null);
                         initialImageView = null;
                     }
                     return true;
