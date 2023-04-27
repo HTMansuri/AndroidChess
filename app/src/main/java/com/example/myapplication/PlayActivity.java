@@ -11,24 +11,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PlayActivity extends AppCompatActivity
 {
     Board[][] chessboard = new Board[8][8];
     ImageView initialImageView, finalImageView, board;
-    int initialrow, initialcol, clickCount = 0;
+    int initialrow, initialcol, clickCount = 0, randid = 1;
     TextView turnTV, messageTV;
-
+    HashMap<String, Integer> idUI = new HashMap<>();
     String color = "";
-    int turn = 0;
-    boolean status = true;
-    int bchecki = 7;
-    int bcheckj = 4;
-    int wchecki = 0;
-    int wcheckj = 4;
-    int queenblackPromo = 3;
-    int queenwhitePromo = 3;
-    boolean check = false;
-    boolean checkMate = false;
+    int turn = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
+    boolean check = false, checkMate = false, status = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,15 +82,25 @@ public class PlayActivity extends AppCompatActivity
                         || chessboard[row][col] instanceof Queen || chessboard[row][col] instanceof Rook))
                     {
                         clickCount++;
-
                         initialrow = row;
                         initialcol = col;
 
                         String name = chessboard[initialrow][initialcol].getUIName();
-                        //debug
-                        System.out.println(name);
-
                         int id = getResources().getIdentifier(name, "id", getPackageName());
+
+                        //debug
+                        System.out.println();
+                        System.out.println(initialrow);
+                        System.out.println(initialcol);
+                        System.out.println(chessboard[row][col].getUIName());
+                        for (Map.Entry<String, Integer> entry : idUI.entrySet()) {
+                            System.out.println(entry.getKey() + " -> " + entry.getValue());
+                        }
+
+                        if(id == 0)
+                        {
+                            id = idUI.get(chessboard[initialrow][initialcol].getUIName());
+                        }
                         initialImageView = findViewById(id);
 
                         GradientDrawable border = new GradientDrawable();
@@ -122,6 +127,10 @@ public class PlayActivity extends AppCompatActivity
                             {
                                 String name = chessboard[row][col].getUIName();
                                 int id = getResources().getIdentifier(name, "id", getPackageName());
+                                if(id == 0)
+                                {
+                                    id = idUI.get(chessboard[row][col].getUIName());
+                                }
                                 finalImageView = findViewById(id);
                                 parent.removeView(finalImageView);
                             }
@@ -165,28 +174,32 @@ public class PlayActivity extends AppCompatActivity
                             //promotion - default is Queen
                             if((row==7 && chessboard[initialrow][initialcol].getName()=="p") || (row==0 && chessboard[initialrow][initialcol].getName()=="p"))
                             {
-                                params = (ConstraintLayout.LayoutParams) initialImageView.getLayoutParams();
-                                params.leftMargin = col * sqsize;
-                                params.topMargin = row * sqsize;
-                                Resources res = v.getContext().getResources();
-                                int id = 0;
-                                //Performs promotion of pawn
                                 if(color.equals("b"))
                                 {
-                                    chessboard[row][col] = new Queen(queenblackPromo);
+                                    //debug
+                                    System.out.println("blackpromo");
+                                    chessboard[row][col] = new Queen(queenblackPromo++);
                                     initialImageView.setImageResource(R.drawable.blackqueen);
-                                    id = res.getIdentifier("blackqueen"+queenblackPromo++, "id", v.getContext().getPackageName());
                                 }
                                 else
                                 {
+                                    //debug
+                                    System.out.println("whitepromo");
                                     chessboard[row][col] = new Queen(queenwhitePromo++);
                                     initialImageView.setImageResource(R.drawable.whitequeen);
-                                    id = res.getIdentifier("whitequeen"+queenblackPromo++, "id", v.getContext().getPackageName());
+                                }
+                                randid++;
+                                ImageView iv = findViewById(randid);
+                                while(iv != null)
+                                {
+                                    randid++;
+                                    iv = findViewById(randid);
                                 }
                                 chessboard[row][col].setColor(color);
                                 chessboard[initialrow][initialcol] = null;
-                                initialImageView.setId(id);
-                                initialImageView.setLayoutParams(params);
+                                System.out.println(chessboard[row][col].getUIName() + " " + randid);
+                                idUI.put(chessboard[row][col].getUIName(), randid);
+                                initialImageView.setId(randid);
                             }
 
                             chessboard[initialrow][initialcol] = null;
@@ -194,6 +207,7 @@ public class PlayActivity extends AppCompatActivity
                             initialImageView = finalImageView = null;
 
                             //debug
+                            System.out.println();
                             Chess.displayChessBoard(chessboard);
                         }
                         else
