@@ -687,6 +687,97 @@ public class Chess
 			horiIndex++;
 		}
 	}
+
+	public static String castling(Board[][] chessboard, int initialrow, int initialcol, int row, int col)
+	{
+		String nm = null;
+		// Checks for valid castling situation
+		if(((chessboard[initialrow][initialcol].getColor().equals("w") && (King.wrcast || King.wlcast)) || (chessboard[initialrow][initialcol].getColor().equals("b") && (King.blcast || King.brcast))) && chessboard[initialrow][initialcol].getName().equals("K"))
+		{
+			//Identify castling side and color, and perform rook move accordingly
+			if(King.blcast && row==0 && col==2)
+			{
+				//rook from 0,0 to 0,3
+				chessboard[0][3] = new Rook(chessboard[0][0].pieceCount);
+				chessboard[0][3].setColor("b");
+				chessboard[0][3].setName("R");
+				chessboard[0][0] = null;
+				nm = chessboard[0][3].getUIName();
+			}
+			else if(King.wlcast && row==7 && col==2)
+			{
+				//rook from 7,0 to 7,3
+				chessboard[7][3] = new Rook(chessboard[7][0].pieceCount);
+				chessboard[7][3].setColor("w");
+				chessboard[7][3].setName("R");
+				chessboard[7][0] = null;
+				nm = chessboard[7][3].getUIName();
+			}
+			else if(King.brcast && row==0 && col==6)
+			{
+				//rook from 0,7 to 0,5
+				chessboard[0][5] = new Rook(chessboard[0][7].pieceCount);
+				chessboard[0][5].setColor("b");
+				chessboard[0][5].setName("R");
+				chessboard[0][7] = null;
+				nm = chessboard[0][5].getUIName();
+			}
+			else if(King.wrcast && row==7 && col==6)
+			{
+				//rook from 7,7 to 7,5
+				chessboard[7][5] = new Rook(chessboard[7][7].pieceCount);
+				chessboard[7][5].setColor("w");
+				chessboard[7][5].setName("R");
+				chessboard[7][7] = null;
+				nm = chessboard[7][5].getUIName();
+			}
+		}
+		//if the rooks or kings move then castling is disabled
+		if(chessboard[row][col] != null)
+		{
+			if((chessboard[row][col].getColor().equals("w")
+					&& chessboard[initialrow][initialcol].isValid(chessboard, initialrow, initialcol, row, col)))
+			{
+				if(chessboard[row][col].getName().equals("K"))
+				{
+					King.wlcast = false;
+					King.wrcast = false;
+				}
+				else if(chessboard[row][col].getName().equals("R"))
+				{
+					if(initialcol==7)
+					{
+						King.wrcast = false;
+					}
+					else if(initialcol==0)
+					{
+						King.wlcast = false;
+					}
+				}
+			}
+			else if((chessboard[row][col].getColor().equals("b")
+					&& chessboard[initialrow][initialcol].isValid(chessboard, initialrow, initialcol, row, col)))
+			{
+				if(chessboard[row][col].getName().equals("K"))
+				{
+					King.blcast = false;
+					King.brcast = false;
+				}
+				else if(chessboard[row][col].getName().equals("R"))
+				{
+					if(initialcol==7)
+					{
+						King.brcast = false;
+					}
+					else if(initialcol==0)
+					{
+						King.blcast = false;
+					}
+				}
+			}
+		}
+		return nm;
+	}
 }
 
 /*

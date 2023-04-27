@@ -35,6 +35,7 @@ public class PlayActivity extends AppCompatActivity
 
         turnTV = findViewById(R.id.turn);
         messageTV = findViewById(R.id.message);
+        messageTV.setText("");
         board = findViewById(R.id.board);
         board.setOnTouchListener(onTouchListener);
 
@@ -68,6 +69,7 @@ public class PlayActivity extends AppCompatActivity
             {
                 case MotionEvent.ACTION_DOWN:
                 {
+                    messageTV.setText("");
                     if(initialImageView != null && chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
                     {
                         initialImageView.setBackground(null);
@@ -122,6 +124,39 @@ public class PlayActivity extends AppCompatActivity
                             ConstraintLayout playLayout = findViewById(R.id.playLayout);
                             playLayout.addView(initialImageView, params);
                             chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
+
+                            //castling
+                            String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
+                            if(nm != null)
+                            {
+                                int id = getResources().getIdentifier(nm, "id", getPackageName());
+                                ImageView temp = findViewById(id);
+                                params = (ConstraintLayout.LayoutParams) temp.getLayoutParams();
+
+                                if(nm.equals("blackrook1"))
+                                {
+                                    params.leftMargin = 3 * sqsize;
+                                    params.topMargin = 0 * sqsize;
+                                }
+                                else if(nm.equals("blackrook2"))
+                                {
+                                    params.leftMargin = 5 * sqsize;
+                                    params.topMargin = 0 * sqsize;
+                                }
+                                else if(nm.equals("whiterook1"))
+                                {
+                                    params.leftMargin = 3 * sqsize;
+                                    params.topMargin = 7 * sqsize;
+                                }
+                                else if(nm.equals("whiterook2"))
+                                {
+                                    params.leftMargin = 5 * sqsize;
+                                    params.topMargin = 7 * sqsize;
+                                }
+                                parent.removeView(temp);
+                                playLayout.addView(temp, params);
+                            }
+
                             chessboard[initialrow][initialcol] = null;
                             turn++;
                             initialImageView = finalImageView = null;
@@ -131,6 +166,7 @@ public class PlayActivity extends AppCompatActivity
                         }
                         else
                         {
+                            messageTV.setText("Illegal move, try again!!!");
                             initialImageView = null;
                         }
                     }
