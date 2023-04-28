@@ -24,6 +24,7 @@ public class PlayActivity extends AppCompatActivity
     String color = "";
     int turn = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
     boolean check = false, checkMate = false, status = true;
+    Board finalCache = null, initialCache = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -87,16 +88,6 @@ public class PlayActivity extends AppCompatActivity
 
                         String name = chessboard[initialrow][initialcol].getUIName();
                         int id = getResources().getIdentifier(name, "id", getPackageName());
-
-                        //debug
-                        System.out.println();
-                        System.out.println(initialrow);
-                        System.out.println(initialcol);
-                        System.out.println(chessboard[row][col].getUIName());
-                        for (Map.Entry<String, Integer> entry : idUI.entrySet()) {
-                            System.out.println(entry.getKey() + " -> " + entry.getValue());
-                        }
-
                         if(id == 0)
                         {
                             id = idUI.get(chessboard[initialrow][initialcol].getUIName());
@@ -111,17 +102,17 @@ public class PlayActivity extends AppCompatActivity
                     }
                     else if(clickCount == 1 && ((chessboard[row][col] != null && !chessboard[row][col].getColor().equals(color)) || chessboard[row][col] == null))
                     {
+                        check = false;
                         clickCount = 0;
                         initialImageView.setBackground(null);
 
                         if(chessboard[initialrow][initialcol].isValid(chessboard, initialrow, initialcol, row, col))
                         {
+                            initialCache = chessboard[initialrow][initialcol];
+                            finalCache = chessboard[row][col];
                             ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) initialImageView.getLayoutParams();
-                            params.leftMargin = col * sqsize;
-                            params.topMargin = row * sqsize;
-
                             ViewGroup parent = (ViewGroup) initialImageView.getParent();
-                            parent.removeView(initialImageView);
+                            ConstraintLayout playLayout = findViewById(R.id.playLayout);
 
                             if(chessboard[row][col] != null)
                             {
@@ -132,12 +123,67 @@ public class PlayActivity extends AppCompatActivity
                                     id = idUI.get(chessboard[row][col].getUIName());
                                 }
                                 finalImageView = findViewById(id);
-                                parent.removeView(finalImageView);
+                            }
+                            chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
+
+                            //keeps track of i and j for check identification
+                            if(chessboard[row][col].getName().equals("K"))
+                            {
+                                if(chessboard[row][col].getColor().equals("w"))
+                                {
+                                    wchecki = row;
+                                    wcheckj = col;
+                                }
+                                else
+                                {
+                                    bchecki = row;
+                                    bcheckj = col;
+                                }
                             }
 
-                            ConstraintLayout playLayout = findViewById(R.id.playLayout);
-                            playLayout.addView(initialImageView, params);
-                            chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
+                            //Here we check for the situation where the move of a player can lead its own king to be in Check.
+                            String c = "";
+                            if(chessboard[row][col]!=null)
+				                c = chessboard[row][col].getColor();
+                			if(c.equals("w"))
+                            {
+                                check = Chess.check(chessboard, wchecki, wcheckj);
+                            }
+                            else if(c.equals("b"))
+                            {
+                                check = Chess.check(chessboard, bchecki, bcheckj);
+                            }
+                            if(check)
+                            {
+                                chessboard[row][col] = finalCache;
+                                chessboard[initialrow][initialcol] = initialCache;
+                                if(chessboard[initialrow][initialcol].getName().equals("K"))
+                                {
+                                    if(chessboard[initialrow][initialcol].getColor().equals("w"))
+                                    {
+                                        wchecki = initialrow;
+                                        wcheckj = initialcol;
+                                    }
+                                    else
+                                    {
+                                        bchecki = initialrow;
+                                        bcheckj = initialcol;
+                                    }
+                                }
+                                messageTV.setText("Illegal move, try again!!!");
+                                return true;
+                            }
+                            else
+                            {
+                                params.leftMargin = col * sqsize;
+                                params.topMargin = row * sqsize;
+                                parent.removeView(initialImageView);
+                                if(chessboard[row][col] != null)
+                                {
+                                    parent.removeView(finalImageView);
+                                }
+                                playLayout.addView(initialImageView, params);
+                            }
 
                             //castling
                             String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
@@ -176,15 +222,11 @@ public class PlayActivity extends AppCompatActivity
                             {
                                 if(color.equals("b"))
                                 {
-                                    //debug
-                                    System.out.println("blackpromo");
                                     chessboard[row][col] = new Queen(queenblackPromo++);
                                     initialImageView.setImageResource(R.drawable.blackqueen);
                                 }
                                 else
                                 {
-                                    //debug
-                                    System.out.println("whitepromo");
                                     chessboard[row][col] = new Queen(queenwhitePromo++);
                                     initialImageView.setImageResource(R.drawable.whitequeen);
                                 }
@@ -202,12 +244,17 @@ public class PlayActivity extends AppCompatActivity
                                 initialImageView.setId(randid);
                             }
 
+
+
+
+
+
                             chessboard[initialrow][initialcol] = null;
                             turn++;
                             initialImageView = finalImageView = null;
 
                             //debug
-                            System.out.println();
+                            System.out.println("\n");
                             Chess.displayChessBoard(chessboard);
                         }
                         else
