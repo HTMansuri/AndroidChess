@@ -1,6 +1,5 @@
 //can your king be in danger if you castle? - Handle it
 //empassant
-//check and checkmate
 package com.example.myapplication;
 
 import android.content.res.Resources;
@@ -24,7 +23,7 @@ public class PlayActivity extends AppCompatActivity
     int initialrow, initialcol, clickCount = 0, randid = 1;
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
-    String color = "";
+    String color = "", won = "";
     int turn = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
     boolean check = false, checkMate = false, status = true;
     Board finalCache = null, initialCache = null;
@@ -56,12 +55,12 @@ public class PlayActivity extends AppCompatActivity
             int col = (int) event.getX()/sqsize;
 
             //Determine turn
-            if(turn%2 != 0)
+            if(turn != -1 && turn%2 != 0)
             {
                 color = "b";
                 turnTV.setText("Black's Move");
             }
-            else
+            else if(turn != -1)
             {
                 color = "w";
                 turnTV.setText("White's Move");
@@ -72,6 +71,13 @@ public class PlayActivity extends AppCompatActivity
                 case MotionEvent.ACTION_DOWN:
                 {
                     messageTV.setText("");
+                    if(turn == -1)
+                    {
+                        turnTV.setText(won);
+                        messageTV.setText("Checkmate");
+                        // after buttons are done - check if i need to disable them here
+                        return true;
+                    }
                     if(initialImageView != null && chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
                     {
                         initialImageView.setBackground(null);
@@ -247,6 +253,38 @@ public class PlayActivity extends AppCompatActivity
                                 initialImageView.setId(randid);
                             }
 
+                            //Here we check for Check or CheckMate to the opponent player.
+                            if(c.equals("b"))
+                            {
+                                check = Chess.check(chessboard, wchecki, wcheckj);
+                            }
+                            else if(c.equals("w"))
+                            {
+                                check = Chess.check(chessboard, bchecki, bcheckj);
+                            }
+                            if(check)
+                            {
+                                messageTV.setText("Check");
+                                if(c.equals("b"))
+                                    checkMate = Chess.checkMate(chessboard, wchecki, wcheckj);
+                                else if(c.equals("w"))
+                                    checkMate = Chess.checkMate(chessboard, bchecki, bcheckj);
+
+                                if(checkMate)
+                                {
+                                    if(c.equals("b"))
+                                        won = "Black wins";
+                                    else if(c.equals("w"))
+                                        won = "White wins";
+                                    turnTV.setText(won);
+                                    messageTV.setText("Checkmate");
+                                    turn = -1;
+                                    //set not required buttons to disabled
+
+                                    return true;
+                                }
+                            }
+
                             chessboard[initialrow][initialcol] = null;
                             turn++;
                             initialImageView = finalImageView = null;
@@ -278,34 +316,3 @@ public class PlayActivity extends AppCompatActivity
         }
     };
 }
-
-//			/**
-//			 * Here we check for Check or CheckMate to the opponent player.
-//			 */
-//			if(c.equals("b"))
-//			{
-//				check = check(board, wchecki, wcheckj);
-//			}
-//			else
-//			{
-//				check = check(board, bchecki, bcheckj);
-//			}
-//			if(check)
-//			{
-//				if(c.equals("b"))
-//					checkMate = checkMate(board, wchecki, wcheckj);
-//				else
-//					checkMate = checkMate(board, bchecki, bcheckj);
-//
-//				if(checkMate && input.length()<=5)
-//				{
-//					System.out.println();
-//					displayChessBoard(board);
-//					System.out.println("\n\nCheckMate");
-//					if(c.equals("b"))
-//						System.out.print("Black wins");
-//					else
-//						System.out.print("White wins");
-//					break;
-//				}
-//			}
