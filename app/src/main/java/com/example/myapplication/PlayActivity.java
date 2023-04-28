@@ -1,3 +1,6 @@
+//can your king be in danger if you castle? - Handle it
+//empassant
+//check and checkmate
 package com.example.myapplication;
 
 import android.content.res.Resources;
@@ -244,11 +247,6 @@ public class PlayActivity extends AppCompatActivity
                                 initialImageView.setId(randid);
                             }
 
-
-
-
-
-
                             chessboard[initialrow][initialcol] = null;
                             turn++;
                             initialImageView = finalImageView = null;
@@ -280,3 +278,34 @@ public class PlayActivity extends AppCompatActivity
         }
     };
 }
+
+//			/**
+//			 * Here we check for Check or CheckMate to the opponent player.
+//			 */
+//			if(c.equals("b"))
+//			{
+//				check = check(board, wchecki, wcheckj);
+//			}
+//			else
+//			{
+//				check = check(board, bchecki, bcheckj);
+//			}
+//			if(check)
+//			{
+//				if(c.equals("b"))
+//					checkMate = checkMate(board, wchecki, wcheckj);
+//				else
+//					checkMate = checkMate(board, bchecki, bcheckj);
+//
+//				if(checkMate && input.length()<=5)
+//				{
+//					System.out.println();
+//					displayChessBoard(board);
+//					System.out.println("\n\nCheckMate");
+//					if(c.equals("b"))
+//						System.out.print("Black wins");
+//					else
+//						System.out.print("White wins");
+//					break;
+//				}
+//			}
