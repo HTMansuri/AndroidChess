@@ -21,8 +21,9 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".PlayActivity" />
+        <activity android:name=".PlayActivity" />
+        <activity android:name=".PlayBackActivity" />
+        <activity android:name=".PlayBackHomeActivity" />
 
     </application>
 </manifest>
