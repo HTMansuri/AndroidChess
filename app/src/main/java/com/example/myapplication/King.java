@@ -67,9 +67,13 @@ public class King extends Board
      */
 	public boolean isValid(Board[][] board, int initiali, int initialj, int finali, int finalj)
 	{
+		boolean check = false;
 		//checks if there are any pieces between Rook and King before castling
 		if(((this.getColor().equals("w") && (wrcast || wlcast)) || (this.getColor().equals("b") && (blcast || brcast))) && Math.abs(initiali-finali) == 0 && Math.abs(initialj-finalj) == 2)
 		{
+			check = Chess.check(board, initiali, initialj);
+			if(check)
+				return false;
 			boolean status = false;
 			if(finalj==2 && ((wlcast && finali==0) || (blcast && finali==7)))
 			{

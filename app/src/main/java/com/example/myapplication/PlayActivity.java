@@ -1,20 +1,17 @@
-//can your king be in danger if you castle? - Handle it
 //empassant
+//king pawn test cases - bug
 package com.example.myapplication;
 
-import android.content.res.Resources;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.view.*;
 import android.widget.TextView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class PlayActivity extends AppCompatActivity
 {
@@ -25,7 +22,7 @@ public class PlayActivity extends AppCompatActivity
     HashMap<String, Integer> idUI = new HashMap<>();
     String color = "", won = "";
     int turn = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
-    boolean check = false, checkMate = false, status = true;
+    boolean check = false, checkMate = false;
     Board finalCache = null, initialCache = null;
 
     @Override
@@ -195,37 +192,39 @@ public class PlayActivity extends AppCompatActivity
                             }
 
                             //castling
-                            String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
-                            if(nm != null)
+                            if(!check)
                             {
-                                int id = getResources().getIdentifier(nm, "id", getPackageName());
-                                ImageView temp = findViewById(id);
-                                params = (ConstraintLayout.LayoutParams) temp.getLayoutParams();
+                                String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
+                                if (nm != null)
+                                {
+                                    int id = getResources().getIdentifier(nm, "id", getPackageName());
+                                    ImageView temp = findViewById(id);
+                                    params = (ConstraintLayout.LayoutParams) temp.getLayoutParams();
 
-                                if(nm.equals("blackrook1"))
-                                {
-                                    params.leftMargin = 3 * sqsize;
-                                    params.topMargin = 0 * sqsize;
+                                    if(nm.equals("blackrook1"))
+                                    {
+                                        params.leftMargin = 3 * sqsize;
+                                        params.topMargin = 0 * sqsize;
+                                    }
+                                    else if(nm.equals("blackrook2"))
+                                    {
+                                        params.leftMargin = 5 * sqsize;
+                                        params.topMargin = 0 * sqsize;
+                                    }
+                                    else if(nm.equals("whiterook1"))
+                                    {
+                                        params.leftMargin = 3 * sqsize;
+                                        params.topMargin = 7 * sqsize;
+                                    }
+                                    else if(nm.equals("whiterook2"))
+                                    {
+                                        params.leftMargin = 5 * sqsize;
+                                        params.topMargin = 7 * sqsize;
+                                    }
+                                    parent.removeView(temp);
+                                    playLayout.addView(temp, params);
                                 }
-                                else if(nm.equals("blackrook2"))
-                                {
-                                    params.leftMargin = 5 * sqsize;
-                                    params.topMargin = 0 * sqsize;
-                                }
-                                else if(nm.equals("whiterook1"))
-                                {
-                                    params.leftMargin = 3 * sqsize;
-                                    params.topMargin = 7 * sqsize;
-                                }
-                                else if(nm.equals("whiterook2"))
-                                {
-                                    params.leftMargin = 5 * sqsize;
-                                    params.topMargin = 7 * sqsize;
-                                }
-                                parent.removeView(temp);
-                                playLayout.addView(temp, params);
                             }
-
                             //promotion - default is Queen
                             if((row==7 && chessboard[initialrow][initialcol].getName()=="p") || (row==0 && chessboard[initialrow][initialcol].getName()=="p"))
                             {
