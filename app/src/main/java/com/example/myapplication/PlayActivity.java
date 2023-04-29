@@ -1,5 +1,3 @@
-//empassant
-//king pawn test cases - bug
 package com.example.myapplication;
 
 import android.graphics.*;
@@ -21,7 +19,7 @@ public class PlayActivity extends AppCompatActivity
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
     String color = "", won = "";
-    int turn = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
+    int turn = 0, enPassantCheck = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
     boolean check = false, checkMate = false;
     Board finalCache = null, initialCache = null;
 
@@ -177,6 +175,8 @@ public class PlayActivity extends AppCompatActivity
                                     }
                                 }
                                 messageTV.setText("Illegal move, try again!!!");
+                                finalImageView = null;
+                                initialImageView = null;
                                 return true;
                             }
                             else
@@ -189,6 +189,40 @@ public class PlayActivity extends AppCompatActivity
                                     parent.removeView(finalImageView);
                                 }
                                 playLayout.addView(initialImageView, params);
+                                if(Pawn.enPassant)
+                                {
+                                    if(chessboard[initialrow][initialcol].getColor().equals("w"))
+                                    {
+                                        if(Pawn.enPassantPos.equals(String.valueOf(row+1)+String.valueOf(col)))
+                                        {
+                                            String name = chessboard[row+1][col].getUIName();
+                                            int id = getResources().getIdentifier(name, "id", getPackageName());
+                                            finalImageView = findViewById(id);
+                                            parent.removeView(finalImageView);
+                                            chessboard[row+1][col] = null;
+                                        }
+                                    }
+                                    else
+                                    {
+                                       if(Pawn.enPassantPos.equals(String.valueOf(row-1)+String.valueOf(col)))
+                                       {
+                                           String name = chessboard[row-1][col].getUIName();
+                                           int id = getResources().getIdentifier(name, "id", getPackageName());
+                                           finalImageView = findViewById(id);
+                                           parent.removeView(finalImageView);
+                                           chessboard[row-1][col] = null;
+                                       }
+                                    }
+                                    //Set enPassant to false, as soon as the opportunity round for enPassant gets completed
+                                    if(enPassantCheck==1)
+                                    {
+                                        enPassantCheck = 0;
+                                        Pawn.enPassant = false;
+                                        Pawn.enPassantPos = null;
+                                    }
+                                    else
+                                        enPassantCheck = 1;
+                                }
                             }
 
                             //castling
@@ -279,14 +313,16 @@ public class PlayActivity extends AppCompatActivity
                                     messageTV.setText("Checkmate");
                                     turn = -1;
                                     //set not required buttons to disabled
-
+                                    initialImageView = null;
+                                    finalImageView = null;
                                     return true;
                                 }
                             }
 
                             chessboard[initialrow][initialcol] = null;
                             turn++;
-                            initialImageView = finalImageView = null;
+                            initialImageView = null;
+                            finalImageView = null;
 
                             //debug
                             System.out.println("\n");

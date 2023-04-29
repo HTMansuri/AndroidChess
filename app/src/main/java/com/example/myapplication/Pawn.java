@@ -86,7 +86,7 @@ public class Pawn extends Board
 							return true;
 						}
 					else if(enPassant && enPassantPos.equals(String.valueOf(finali-1)+String.valueOf(finalj))) {
-						board[finali-1][finalj] = null;
+						//board[finali-1][finalj] = null;
 						return true;
 					}
 				}
@@ -116,7 +116,7 @@ public class Pawn extends Board
 							return true;
 						}
 					else if(enPassant && enPassantPos.equals(String.valueOf(finali+1)+String.valueOf(finalj))) {
-						board[finali+1][finalj] = null;
+						//board[finali+1][finalj] = null;
 						return true;
 					}
 				}
@@ -132,7 +132,7 @@ public class Pawn extends Board
 	 */
 	public Board move(Board obj)
 	{
-		obj = new Pawn(pieceCount);
+		obj = new Pawn(this.pieceCount);
 		obj.setColor(this.getColor());
 		obj.setName(this.getName());
 		return obj;
