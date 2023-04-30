@@ -1,12 +1,24 @@
+//should castling be allowed after undoing it
+//checkmate bug when king can be saved by interference key
+
 package com.example.myapplication;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.view.*;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -15,8 +27,8 @@ import java.util.HashMap;
 public class PlayActivity extends AppCompatActivity
 {
     Board[][] chessboard = new Board[8][8];
-    Board prevFinObj = null, prevInitObj = null;
-    ImageView initialImageView, finalImageView, board, prevFinObjImg, prevInitObjImg;
+    Board prevFinObj, prevInitObj, prevCastledRook;
+    ImageView initialImageView, finalImageView, board, prevFinObjImg, prevInitObjImg, prevCastledRookImg;
     int initialrow, initialcol, clickCount = 0, randid = 1, prevRow, prevCol, currRow, currCol;
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
@@ -25,7 +37,7 @@ public class PlayActivity extends AppCompatActivity
     boolean check = false, checkMate = false;
     Board finalCache = null, initialCache = null;
 
-    Button undoButton;
+    Button undoButton, resignButton, drawButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,42 +54,173 @@ public class PlayActivity extends AppCompatActivity
         //debug
         Chess.displayChessBoard(chessboard);
         undoButton = findViewById(R.id.undo);
-
+        resignButton = findViewById(R.id.resign);
+        undoButton.setAlpha(0.5f);
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int sqsize = board.getWidth() / 8;
-                chessboard[prevRow][prevCol] = prevInitObj;
-                chessboard[currRow][currCol] = prevFinObj;
-                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) prevInitObjImg.getLayoutParams();
-                ViewGroup parent = (ViewGroup) prevInitObjImg.getParent();
-                ConstraintLayout playLayout = findViewById(R.id.playLayout);
+                    messageTV.setText("");
+                    int sqsize = board.getWidth() / 8;
+                    chessboard[prevRow][prevCol] = prevInitObj;
+                    chessboard[currRow][currCol] = prevFinObj;
+                    ConstraintLayout playLayout = findViewById(R.id.playLayout);
+                    if (prevInitObjImg != null) {
+                        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) prevInitObjImg.getLayoutParams();
+                        ViewGroup parent = (ViewGroup) prevInitObjImg.getParent();
 
-                params.leftMargin = prevCol * sqsize;
-                params.topMargin = prevRow * sqsize;
-                parent.removeView(prevInitObjImg);
-                playLayout.addView(prevInitObjImg, params);
-                if (prevFinObjImg != null) {
-                    ConstraintLayout.LayoutParams paramsFin = (ConstraintLayout.LayoutParams) prevFinObjImg.getLayoutParams();
-                    ViewGroup parentFin = (ViewGroup) prevFinObjImg.getParent();
-                    paramsFin.leftMargin = currCol * sqsize;
-                    paramsFin.topMargin = currRow * sqsize;
-                    playLayout.addView(prevFinObjImg, paramsFin);
-                }
-                turn--;
-                if(turn != -1 && turn%2 != 0)
-                {
-                    color = "b";
-                    turnTV.setText("Black's Move");
-                }
-                else if(turn != -1)
-                {
-                    color = "w";
-                    turnTV.setText("White's Move");
-                }
-                Chess.displayChessBoard(chessboard);
+                        params.leftMargin = prevCol * sqsize;
+                        params.topMargin = prevRow * sqsize;
+                        parent.removeView(prevInitObjImg);
+                        playLayout.addView(prevInitObjImg, params);
+                    }
+                    if (prevFinObjImg != null) {
+                        ConstraintLayout.LayoutParams paramsFin = (ConstraintLayout.LayoutParams) prevFinObjImg.getLayoutParams();
+                        ViewGroup parentFin = (ViewGroup) prevFinObjImg.getParent();
+                        paramsFin.leftMargin = currCol * sqsize;
+                        paramsFin.topMargin = currRow * sqsize;
+                        playLayout.addView(prevFinObjImg, paramsFin);
+                    }
+                    if (prevCastledRook != null) {
+                        ConstraintLayout.LayoutParams paramsRk = (ConstraintLayout.LayoutParams) prevCastledRookImg.getLayoutParams();
+                        ViewGroup parentRk = (ViewGroup) prevCastledRookImg.getParent();
+                        String nm = prevCastledRook.getUIName();
+                        if (nm.equals("blackrook1")) {
+                            chessboard[0][3] = null;
+                            chessboard[0][1] = prevCastledRook;
+                            paramsRk.leftMargin = 1 * sqsize;
+                            paramsRk.topMargin = 0 * sqsize;
+                        } else if (nm.equals("blackrook2")) {
+                            chessboard[0][5] = null;
+                            chessboard[0][7] = prevCastledRook;
+                            paramsRk.leftMargin = 7 * sqsize;
+                            paramsRk.topMargin = 0 * sqsize;
+                        } else if (nm.equals("whiterook1")) {
+                            chessboard[7][3] = null;
+                            chessboard[7][0] = prevCastledRook;
+                            paramsRk.leftMargin = 0 * sqsize;
+                            paramsRk.topMargin = 7 * sqsize;
+                        } else if (nm.equals("whiterook2")) {
+                            chessboard[7][5] = null;
+                            chessboard[7][7] = prevCastledRook;
+                            paramsRk.leftMargin = 7 * sqsize;
+                            paramsRk.topMargin = 7 * sqsize;
+                        }
+                        parentRk.removeView(prevCastledRookImg);
+                        playLayout.addView(prevCastledRookImg, paramsRk);
+                    }
+                    if(chessboard[prevRow][prevCol]!=null)
+                    turn--;
+                    if (turn != -1 && turn % 2 != 0) {
+                        color = "b";
+                        turnTV.setText("Black's Move");
+                    } else if (turn != -1) {
+                        color = "w";
+                        turnTV.setText("White's Move");
+                    }
+                    check = false;
+                    if (chessboard[prevRow][prevCol]!=null && chessboard[prevRow][prevCol].getColor().equals("w")) {
+                        if (chessboard[prevRow][prevCol] instanceof King) {
+                            wchecki = prevRow;
+                            wcheckj = prevCol;
+                            System.out.println("wchecki: " + wchecki + ", wcheckj: " + wcheckj);
+                        }
+                        check = Chess.check(chessboard, wchecki, wcheckj);
+                    } else {
+                        if (chessboard[prevRow][prevCol]!=null && chessboard[prevRow][prevCol] instanceof King) {
+                            bchecki = prevRow;
+                            bcheckj = prevCol;
+                            System.out.println("bchecki: " + bchecki + ", bcheckj: " + bcheckj);
+                        }
+                        check = Chess.check(chessboard, bchecki, bcheckj);
+                    }
+                    if (check) {
+                        messageTV.setText("Check");
+                    }
+                    undoButton.setClickable(false);
+                    undoButton.setAlpha(0.5f);
+                    //debug
+                    Chess.displayChessBoard(chessboard);
             }
         });
+
+        resignButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                if(color.equals("b"))
+                    builder.setTitle("White Wins - Black Resigned!");
+                else
+                    builder.setTitle("Black Wins - White Resigned!");
+                builder.setMessage("Would you like to save this game ?");
+                //builder.setCancelable(true);
+
+//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                    @Override
+//                    public void onCancel(DialogInterface dialogInterface) {
+//                        // Same as code to "NO"
+//                    }
+//                });
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Handle "Yes" button click
+                        AlertDialog.Builder nameBuilder = new AlertDialog.Builder(v.getContext());
+                        nameBuilder.setTitle("Save Game");
+                        nameBuilder.setMessage("\nEnter game name");
+
+                        final EditText input = new EditText(nameBuilder.getContext());
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.MATCH_PARENT);
+                        //lp.setMargins(convertDpToPx(100), 0, convertDpToPx(48), 0); // Add left margin of 24dp
+                        input.setLayoutParams(lp);
+
+                        // Add padding to the EditText
+                        int paddingDp = 24;
+                        float density = v.getContext().getResources().getDisplayMetrics().density;
+                        int paddingPx = (int) (paddingDp * density);
+                        input.setPadding(paddingPx, paddingPx, paddingPx, (int)(paddingPx/1.5));
+
+// Add a background to the EditText
+                        //input.setBackgroundResource(R.drawable.edit_text_background);
+
+                        nameBuilder.setView(input);
+
+                        nameBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Handle "Save" button click
+                                String gameName = input.getText().toString();
+                                // Code to save the game
+                                Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(v.getContext(), "Game Saved!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        nameBuilder.show();
+
+                    }
+                });
+
+                builder.setNegativeButton("No, Exit!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Handle "No" button click
+                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
+                builder.show();
+            }
+        });
+    }
+
+    private int convertDpToPx(int dp) {
+            float density = getResources().getDisplayMetrics().density;
+            return Math.round(dp * density);
     }
 
     View.OnTouchListener onTouchListener = new View.OnTouchListener()
@@ -126,11 +269,13 @@ public class PlayActivity extends AppCompatActivity
                         || chessboard[row][col] instanceof Knight || chessboard[row][col] instanceof Pawn
                         || chessboard[row][col] instanceof Queen || chessboard[row][col] instanceof Rook))
                     {
+                        if(check)
+                        {
+                            messageTV.setText("Check");
+                        }
                         clickCount++;
                         initialrow = row;
                         initialcol = col;
-                        prevRow = row;
-                        prevCol = col;
 
                         String name = chessboard[initialrow][initialcol].getUIName();
                         int id = getResources().getIdentifier(name, "id", getPackageName());
@@ -139,7 +284,6 @@ public class PlayActivity extends AppCompatActivity
                             id = idUI.get(chessboard[initialrow][initialcol].getUIName());
                         }
                         initialImageView = findViewById(id);
-                        prevInitObj = chessboard[initialrow][initialcol];
 
                         GradientDrawable border = new GradientDrawable();
                         border.setShape(GradientDrawable.RECTANGLE);
@@ -229,6 +373,14 @@ public class PlayActivity extends AppCompatActivity
                                 params.topMargin = row * sqsize;
                                 prevInitObjImg = initialImageView;
                                 parent.removeView(initialImageView);
+                                prevFinObjImg = null;
+                                prevInitObj = chessboard[initialrow][initialcol];
+                                prevRow = initialrow;
+                                prevCol = initialcol;
+                                undoButton.setClickable(true);
+                                undoButton.setAlpha(1.0f);
+                                prevCastledRook = null;
+                                prevCastledRookImg = null;
                                 if(chessboard[row][col] != null)
                                 {
                                     prevFinObjImg = finalImageView;
@@ -281,25 +433,30 @@ public class PlayActivity extends AppCompatActivity
                                 {
                                     int id = getResources().getIdentifier(nm, "id", getPackageName());
                                     ImageView temp = findViewById(id);
+                                    prevCastledRookImg = temp;
                                     params = (ConstraintLayout.LayoutParams) temp.getLayoutParams();
 
                                     if(nm.equals("blackrook1"))
                                     {
+                                        prevCastledRook = chessboard[0][3];
                                         params.leftMargin = 3 * sqsize;
                                         params.topMargin = 0 * sqsize;
                                     }
                                     else if(nm.equals("blackrook2"))
                                     {
+                                        prevCastledRook = chessboard[0][5];
                                         params.leftMargin = 5 * sqsize;
                                         params.topMargin = 0 * sqsize;
                                     }
                                     else if(nm.equals("whiterook1"))
                                     {
+                                        prevCastledRook = chessboard[7][3];
                                         params.leftMargin = 3 * sqsize;
                                         params.topMargin = 7 * sqsize;
                                     }
                                     else if(nm.equals("whiterook2"))
                                     {
+                                        prevCastledRook = chessboard[7][5];
                                         params.leftMargin = 5 * sqsize;
                                         params.topMargin = 7 * sqsize;
                                     }
@@ -360,6 +517,34 @@ public class PlayActivity extends AppCompatActivity
                                     turnTV.setText(won);
                                     messageTV.setText("Checkmate");
                                     turn = -1;
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                                    builder.setTitle("You Win");
+                                    builder.setMessage("Would you like to save this game ?");
+                                    builder.setCancelable(true);
+                                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                        @Override
+                                        public void onCancel(DialogInterface dialogInterface) {
+                                            // Same as code to "NO"
+                                        }
+                                    });
+
+                                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Handle "Yes" button click
+                                            // Code to save the game
+                                        }
+                                    });
+
+                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Handle "No" button click
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    builder.show();
                                     //set not required buttons to disabled
                                     initialImageView = null;
                                     finalImageView = null;

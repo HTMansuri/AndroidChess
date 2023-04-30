@@ -75,7 +75,7 @@ public class King extends Board
 			if(check)
 				return false;
 			boolean status = false;
-			if(finalj==2 && ((wlcast && finali==0) || (blcast && finali==7)))
+			if(finalj==2 && ((wlcast && finali==7) || (blcast && finali==0)))
 			{
 				status = true;
 				int i=0;
@@ -87,7 +87,7 @@ public class King extends Board
 						return false;
 				}
 			}
-			else if(finalj==6 && ((wrcast && finali==0) || (brcast && finali==7)))
+			else if(finalj==6 && ((wrcast && finali==7) || (brcast && finali==0)))
 			{
 				status = true;
 				int i=0;
