@@ -3,6 +3,7 @@
 
 package com.example.myapplication;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Context;
@@ -22,7 +23,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class PlayActivity extends AppCompatActivity
 {
@@ -38,12 +44,11 @@ public class PlayActivity extends AppCompatActivity
     Board finalCache = null, initialCache = null;
 
     Button undoButton, resignButton, drawButton;
-
+    List<String> moves = new ArrayList<String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
-
         turnTV = findViewById(R.id.turn);
         messageTV = findViewById(R.id.message);
         messageTV.setText("");
@@ -55,8 +60,10 @@ public class PlayActivity extends AppCompatActivity
         Chess.displayChessBoard(chessboard);
         undoButton = findViewById(R.id.undo);
         resignButton = findViewById(R.id.resign);
+        drawButton = findViewById(R.id.draw);
         undoButton.setAlpha(0.5f);
         undoButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SuspiciousIndentation")
             @Override
             public void onClick(View view) {
                     messageTV.setText("");
@@ -108,8 +115,10 @@ public class PlayActivity extends AppCompatActivity
                         parentRk.removeView(prevCastledRookImg);
                         playLayout.addView(prevCastledRookImg, paramsRk);
                     }
-                    if(chessboard[prevRow][prevCol]!=null)
-                    turn--;
+                    if(chessboard[prevRow][prevCol]!=null) {
+                        turn--;
+                        moves.remove(moves.size()-1);
+                    }
                     if (turn != -1 && turn % 2 != 0) {
                         color = "b";
                         turnTV.setText("Black's Move");
@@ -192,7 +201,105 @@ public class PlayActivity extends AppCompatActivity
                             public void onClick(DialogInterface dialog, int which) {
                                 // Handle "Save" button click
                                 String gameName = input.getText().toString();
-                                // Code to save the game
+                                try{
+                                    File newFile = new File(getApplicationContext().getFilesDir(),gameName+".txt");
+                                    newFile.createNewFile();
+                                    FileWriter fw = new FileWriter(newFile);
+                                    for(String move : moves)
+                                        fw.write(move);
+                                    fw.write("resign");
+                                    fw.write((color.equals("b")?"White":"Black")+"Wins - "+(color.equals("w")?"White":"Black")+" Resinged!");
+                                    fw.close();
+                                }
+                                catch(IOException e){
+                                    e.printStackTrace();
+                                }
+                                Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                Toast.makeText(v.getContext(), "Game Saved!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        nameBuilder.show();
+
+                    }
+                });
+
+                builder.setNegativeButton("No, Exit!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Handle "No" button click
+                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+        drawButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                if(color.equals("b"))
+                    builder.setTitle("Game Drawn by Black!");
+                else
+                    builder.setTitle("Game Drawn by White!");
+                builder.setMessage("Would you like to save this game ?");
+                //builder.setCancelable(true);
+
+//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                    @Override
+//                    public void onCancel(DialogInterface dialogInterface) {
+//                        // Same as code to "NO"
+//                    }
+//                });
+
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Handle "Yes" button click
+                        AlertDialog.Builder nameBuilder = new AlertDialog.Builder(v.getContext());
+                        nameBuilder.setTitle("Save Game");
+                        nameBuilder.setMessage("\nEnter game name");
+
+                        final EditText input = new EditText(nameBuilder.getContext());
+                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.MATCH_PARENT);
+                        //lp.setMargins(convertDpToPx(100), 0, convertDpToPx(48), 0); // Add left margin of 24dp
+                        input.setLayoutParams(lp);
+
+                        // Add padding to the EditText
+                        int paddingDp = 24;
+                        float density = v.getContext().getResources().getDisplayMetrics().density;
+                        int paddingPx = (int) (paddingDp * density);
+                        input.setPadding(paddingPx, paddingPx, paddingPx, (int)(paddingPx/1.5));
+
+// Add a background to the EditText
+                        //input.setBackgroundResource(R.drawable.edit_text_background);
+
+                        nameBuilder.setView(input);
+
+                        nameBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Handle "Save" button click
+                                String gameName = input.getText().toString();
+                                try{
+                                    File newFile = new File(getApplicationContext().getFilesDir(),gameName+".txt");
+                                    newFile.createNewFile();
+                                    FileWriter fw = new FileWriter(newFile);
+                                    for(String move : moves)
+                                        fw.write(move);
+                                    fw.write("draw");
+                                    fw.write("Game Drawn by "+(color.equals("w")?"White":"Black"));
+                                    fw.close();
+                                }
+                                catch(IOException e){
+                                    e.printStackTrace();
+                                }
                                 Intent intent = new Intent(PlayActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 Toast.makeText(v.getContext(), "Game Saved!", Toast.LENGTH_SHORT).show();
@@ -389,6 +496,7 @@ public class PlayActivity extends AppCompatActivity
                                 playLayout.addView(initialImageView, params);
                                 currRow = row;
                                 currCol = col;
+                                moves.add(initialrow+initialcol+" "+row+col);
                                 if(Pawn.enPassant)
                                 {
                                     if(chessboard[initialrow][initialcol].getColor().equals("w"))
