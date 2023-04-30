@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.view.*;
 import android.widget.TextView;
@@ -14,8 +15,9 @@ import java.util.HashMap;
 public class PlayActivity extends AppCompatActivity
 {
     Board[][] chessboard = new Board[8][8];
-    ImageView initialImageView, finalImageView, board;
-    int initialrow, initialcol, clickCount = 0, randid = 1;
+    Board prevFinObj = null, prevInitObj = null;
+    ImageView initialImageView, finalImageView, board, prevFinObjImg, prevInitObjImg;
+    int initialrow, initialcol, clickCount = 0, randid = 1, prevRow, prevCol, currRow, currCol;
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
     String color = "", won = "";
@@ -23,9 +25,10 @@ public class PlayActivity extends AppCompatActivity
     boolean check = false, checkMate = false;
     Board finalCache = null, initialCache = null;
 
+    Button undoButton;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
@@ -38,6 +41,43 @@ public class PlayActivity extends AppCompatActivity
         Chess.initChessBoard(chessboard);
         //debug
         Chess.displayChessBoard(chessboard);
+        undoButton = findViewById(R.id.undo);
+
+        undoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int sqsize = board.getWidth() / 8;
+                chessboard[prevRow][prevCol] = prevInitObj;
+                chessboard[currRow][currCol] = prevFinObj;
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) prevInitObjImg.getLayoutParams();
+                ViewGroup parent = (ViewGroup) prevInitObjImg.getParent();
+                ConstraintLayout playLayout = findViewById(R.id.playLayout);
+
+                params.leftMargin = prevCol * sqsize;
+                params.topMargin = prevRow * sqsize;
+                parent.removeView(prevInitObjImg);
+                playLayout.addView(prevInitObjImg, params);
+                if (prevFinObjImg != null) {
+                    ConstraintLayout.LayoutParams paramsFin = (ConstraintLayout.LayoutParams) prevFinObjImg.getLayoutParams();
+                    ViewGroup parentFin = (ViewGroup) prevFinObjImg.getParent();
+                    paramsFin.leftMargin = currCol * sqsize;
+                    paramsFin.topMargin = currRow * sqsize;
+                    playLayout.addView(prevFinObjImg, paramsFin);
+                }
+                turn--;
+                if(turn != -1 && turn%2 != 0)
+                {
+                    color = "b";
+                    turnTV.setText("Black's Move");
+                }
+                else if(turn != -1)
+                {
+                    color = "w";
+                    turnTV.setText("White's Move");
+                }
+                Chess.displayChessBoard(chessboard);
+            }
+        });
     }
 
     View.OnTouchListener onTouchListener = new View.OnTouchListener()
@@ -89,6 +129,8 @@ public class PlayActivity extends AppCompatActivity
                         clickCount++;
                         initialrow = row;
                         initialcol = col;
+                        prevRow = row;
+                        prevCol = col;
 
                         String name = chessboard[initialrow][initialcol].getUIName();
                         int id = getResources().getIdentifier(name, "id", getPackageName());
@@ -97,6 +139,7 @@ public class PlayActivity extends AppCompatActivity
                             id = idUI.get(chessboard[initialrow][initialcol].getUIName());
                         }
                         initialImageView = findViewById(id);
+                        prevInitObj = chessboard[initialrow][initialcol];
 
                         GradientDrawable border = new GradientDrawable();
                         border.setShape(GradientDrawable.RECTANGLE);
@@ -128,6 +171,7 @@ public class PlayActivity extends AppCompatActivity
                                 }
                                 finalImageView = findViewById(id);
                             }
+                            prevFinObj = chessboard[row][col];
                             chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
 
                             //keeps track of i and j for check identification
@@ -183,12 +227,16 @@ public class PlayActivity extends AppCompatActivity
                             {
                                 params.leftMargin = col * sqsize;
                                 params.topMargin = row * sqsize;
+                                prevInitObjImg = initialImageView;
                                 parent.removeView(initialImageView);
                                 if(chessboard[row][col] != null)
                                 {
+                                    prevFinObjImg = finalImageView;
                                     parent.removeView(finalImageView);
                                 }
                                 playLayout.addView(initialImageView, params);
+                                currRow = row;
+                                currCol = col;
                                 if(Pawn.enPassant)
                                 {
                                     if(chessboard[initialrow][initialcol].getColor().equals("w"))
