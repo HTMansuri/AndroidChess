@@ -5,6 +5,9 @@ import android.view.View;
 import android.content.Intent;
 import android.widget.Button;
 
+import java.io.File;
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
 {
     @Override
@@ -12,7 +15,15 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+//
+//        File dataDir = getApplicationContext().getFilesDir();
+//        File[] files = dataDir.listFiles();
+//
+//        if (files != null) {
+//            for (File file : files) {
+//                file.delete();
+//            }
+//        }
         //get all saved data
         getData();
 

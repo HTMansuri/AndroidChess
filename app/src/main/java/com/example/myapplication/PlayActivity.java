@@ -34,9 +34,9 @@ import java.util.List;
 public class PlayActivity extends AppCompatActivity
 {
     Board[][] chessboard = new Board[8][8];
-    Board prevFinObj, prevInitObj, prevCastledRook;
-    ImageView initialImageView, finalImageView, board, prevFinObjImg, prevInitObjImg, prevCastledRookImg;
-    int initialrow, initialcol, clickCount = 0, randid = 1, prevRow, prevCol, currRow, currCol;
+    Board prevFinObj, prevInitObj, prevCastledRook, prevEnPassantPawn;
+    ImageView initialImageView, finalImageView, board, prevFinObjImg, prevInitObjImg, prevCastledRookImg, prevEnPassantPawnImg;
+    int initialrow, initialcol, clickCount = 0, randid = 1, prevRow, prevCol, currRow, currCol, prevEnPassantRow, prevEnPassantCol;
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
     String color = "", won = "";
@@ -87,13 +87,21 @@ public class PlayActivity extends AppCompatActivity
                         paramsFin.topMargin = currRow * sqsize;
                         playLayout.addView(prevFinObjImg, paramsFin);
                     }
+                    if(prevEnPassantPawn != null){
+                        ConstraintLayout.LayoutParams paramsEnpPawn = (ConstraintLayout.LayoutParams) prevEnPassantPawnImg.getLayoutParams();
+                        ViewGroup parentEnpPawn = (ViewGroup) prevEnPassantPawnImg.getParent();
+                        paramsEnpPawn.leftMargin = prevEnPassantCol * sqsize;
+                        paramsEnpPawn.topMargin = prevEnPassantRow * sqsize;
+                        playLayout.addView(prevEnPassantPawnImg, paramsEnpPawn);
+                        chessboard[prevEnPassantRow][prevEnPassantCol] = prevEnPassantPawn;
+                    }
                     if (prevCastledRook != null) {
                         ConstraintLayout.LayoutParams paramsRk = (ConstraintLayout.LayoutParams) prevCastledRookImg.getLayoutParams();
                         ViewGroup parentRk = (ViewGroup) prevCastledRookImg.getParent();
                         String nm = prevCastledRook.getUIName();
                         if (nm.equals("blackrook1")) {
                             chessboard[0][3] = null;
-                            chessboard[0][1] = prevCastledRook;
+                            chessboard[0][0] = prevCastledRook;
                             paramsRk.leftMargin = 1 * sqsize;
                             paramsRk.topMargin = 0 * sqsize;
                         } else if (nm.equals("blackrook2")) {
@@ -206,9 +214,9 @@ public class PlayActivity extends AppCompatActivity
                                     newFile.createNewFile();
                                     FileWriter fw = new FileWriter(newFile);
                                     for(String move : moves)
-                                        fw.write(move);
-                                    fw.write("resign");
-                                    fw.write((color.equals("b")?"White":"Black")+"Wins - "+(color.equals("w")?"White":"Black")+" Resinged!");
+                                        fw.write(move+"\n");
+                                    fw.write("resign\n");
+                                    fw.write((color.equals("b")?"White":"Black")+" Wins - "+(color.equals("w")?"White":"Black")+" Resinged!");
                                     newFile.setLastModified(System.currentTimeMillis());
                                     fw.close();
                                 }
@@ -293,8 +301,8 @@ public class PlayActivity extends AppCompatActivity
                                     newFile.createNewFile();
                                     FileWriter fw = new FileWriter(newFile);
                                     for(String move : moves)
-                                        fw.write(move);
-                                    fw.write("draw");
+                                        fw.write(move+"\n");
+                                    fw.write("draw\n");
                                     fw.write("Game Drawn by "+(color.equals("w")?"White":"Black"));
                                     newFile.setLastModified(System.currentTimeMillis());
                                     fw.close();
@@ -403,6 +411,7 @@ public class PlayActivity extends AppCompatActivity
                     else if(clickCount == 1 && ((chessboard[row][col] != null && !chessboard[row][col].getColor().equals(color)) || chessboard[row][col] == null))
                     {
                         check = false;
+                        String move = "";
                         clickCount = 0;
                         initialImageView.setBackground(null);
 
@@ -490,6 +499,8 @@ public class PlayActivity extends AppCompatActivity
                                 undoButton.setAlpha(1.0f);
                                 prevCastledRook = null;
                                 prevCastledRookImg = null;
+                                prevEnPassantPawn = null;
+                                prevEnPassantPawnImg = null;
                                 if(chessboard[row][col] != null)
                                 {
                                     prevFinObjImg = finalImageView;
@@ -498,7 +509,7 @@ public class PlayActivity extends AppCompatActivity
                                 playLayout.addView(initialImageView, params);
                                 currRow = row;
                                 currCol = col;
-                                moves.add(initialrow+initialcol+" "+row+col);
+                                move = String.valueOf(initialrow)+String.valueOf(initialcol)+" "+String.valueOf(row)+String.valueOf(col);
                                 if(Pawn.enPassant)
                                 {
                                     if(chessboard[initialrow][initialcol].getColor().equals("w"))
@@ -508,8 +519,13 @@ public class PlayActivity extends AppCompatActivity
                                             String name = chessboard[row+1][col].getUIName();
                                             int id = getResources().getIdentifier(name, "id", getPackageName());
                                             finalImageView = findViewById(id);
+                                            prevEnPassantPawnImg = finalImageView;
                                             parent.removeView(finalImageView);
+                                            prevEnPassantPawn = chessboard[row+1][col];
+                                            prevEnPassantRow = row+1;
+                                            prevEnPassantCol = col;
                                             chessboard[row+1][col] = null;
+                                            move += " enPassant "+String.valueOf(row+1)+" "+String.valueOf(col);
                                         }
                                     }
                                     else
@@ -519,8 +535,13 @@ public class PlayActivity extends AppCompatActivity
                                            String name = chessboard[row-1][col].getUIName();
                                            int id = getResources().getIdentifier(name, "id", getPackageName());
                                            finalImageView = findViewById(id);
+                                           prevEnPassantPawnImg = finalImageView;
                                            parent.removeView(finalImageView);
+                                           prevEnPassantPawn = chessboard[row-1][col];
+                                           prevEnPassantRow = row-1;
+                                           prevEnPassantCol = col;
                                            chessboard[row-1][col] = null;
+                                           move += " enPassant "+String.valueOf(row-1)+" "+String.valueOf(col);
                                        }
                                     }
                                     //Set enPassant to false, as soon as the opportunity round for enPassant gets completed
@@ -549,24 +570,28 @@ public class PlayActivity extends AppCompatActivity
                                     if(nm.equals("blackrook1"))
                                     {
                                         prevCastledRook = chessboard[0][3];
+                                        move += " castledRook 0 0 0 3";
                                         params.leftMargin = 3 * sqsize;
                                         params.topMargin = 0 * sqsize;
                                     }
                                     else if(nm.equals("blackrook2"))
                                     {
                                         prevCastledRook = chessboard[0][5];
+                                        move += " castledRook 0 7 0 5";
                                         params.leftMargin = 5 * sqsize;
                                         params.topMargin = 0 * sqsize;
                                     }
                                     else if(nm.equals("whiterook1"))
                                     {
                                         prevCastledRook = chessboard[7][3];
+                                        move += " castledRook 7 0 7 3";
                                         params.leftMargin = 3 * sqsize;
                                         params.topMargin = 7 * sqsize;
                                     }
                                     else if(nm.equals("whiterook2"))
                                     {
                                         prevCastledRook = chessboard[7][5];
+                                        move += " castledRook 7 7 7 5";
                                         params.leftMargin = 5 * sqsize;
                                         params.topMargin = 7 * sqsize;
                                     }
@@ -581,11 +606,13 @@ public class PlayActivity extends AppCompatActivity
                                 {
                                     chessboard[row][col] = new Queen(queenblackPromo++);
                                     initialImageView.setImageResource(R.drawable.blackqueen);
+                                    move += " promotion";
                                 }
                                 else
                                 {
                                     chessboard[row][col] = new Queen(queenwhitePromo++);
                                     initialImageView.setImageResource(R.drawable.whitequeen);
+                                    move += " promotion";
                                 }
                                 randid++;
                                 ImageView iv = findViewById(randid);
@@ -612,6 +639,7 @@ public class PlayActivity extends AppCompatActivity
                             }
                             if(check)
                             {
+                                move += " check";
                                 messageTV.setText("Check");
                                 if(c.equals("b"))
                                     checkMate = Chess.checkMate(chessboard, wchecki, wcheckj);
@@ -626,6 +654,7 @@ public class PlayActivity extends AppCompatActivity
                                         won = "White wins";
                                     turnTV.setText(won);
                                     messageTV.setText("Checkmate");
+                                    move += "checkmate";
                                     turn = -1;
                                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
                                     if(color.equals("b"))
@@ -678,9 +707,8 @@ public class PlayActivity extends AppCompatActivity
                                                         newFile.createNewFile();
                                                         FileWriter fw = new FileWriter(newFile);
                                                         for(String move : moves)
-                                                            fw.write(move);
-                                                        fw.write("checkmate");
-                                                        fw.write((color.equals("w")?"White":"Black")+"Wins!");
+                                                            fw.write(move+"\n");
+                                                        fw.write("checkmate, "+(color.equals("w")?"White":"Black")+" Wins!");
                                                         newFile.setLastModified(System.currentTimeMillis());
                                                         fw.close();
                                                     }
@@ -711,12 +739,14 @@ public class PlayActivity extends AppCompatActivity
                                     //set not required buttons to disabled
                                     initialImageView = null;
                                     finalImageView = null;
+                                    moves.add(move);
                                     return true;
                                 }
                             }
 
                             chessboard[initialrow][initialcol] = null;
                             turn++;
+                            moves.add(move);
                             initialImageView = null;
                             finalImageView = null;
 
