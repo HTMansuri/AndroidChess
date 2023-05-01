@@ -26,6 +26,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +64,6 @@ public class PlayActivity extends AppCompatActivity
         drawButton = findViewById(R.id.draw);
         undoButton.setAlpha(0.5f);
         undoButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("SuspiciousIndentation")
             @Override
             public void onClick(View view) {
                     messageTV.setText("");
@@ -209,6 +209,7 @@ public class PlayActivity extends AppCompatActivity
                                         fw.write(move);
                                     fw.write("resign");
                                     fw.write((color.equals("b")?"White":"Black")+"Wins - "+(color.equals("w")?"White":"Black")+" Resinged!");
+                                    newFile.setLastModified(System.currentTimeMillis());
                                     fw.close();
                                 }
                                 catch(IOException e){
@@ -295,6 +296,7 @@ public class PlayActivity extends AppCompatActivity
                                         fw.write(move);
                                     fw.write("draw");
                                     fw.write("Game Drawn by "+(color.equals("w")?"White":"Black"));
+                                    newFile.setLastModified(System.currentTimeMillis());
                                     fw.close();
                                 }
                                 catch(IOException e){
@@ -626,29 +628,82 @@ public class PlayActivity extends AppCompatActivity
                                     messageTV.setText("Checkmate");
                                     turn = -1;
                                     AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                                    builder.setTitle("You Win");
+                                    if(color.equals("b"))
+                                        builder.setTitle("Black Wins!");
+                                    else
+                                        builder.setTitle("White Wins!");
                                     builder.setMessage("Would you like to save this game ?");
-                                    builder.setCancelable(true);
-                                    builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                                        @Override
-                                        public void onCancel(DialogInterface dialogInterface) {
-                                            // Same as code to "NO"
-                                        }
-                                    });
+                                    //builder.setCancelable(true);
+
+//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+//                    @Override
+//                    public void onCancel(DialogInterface dialogInterface) {
+//                        // Same as code to "NO"
+//                    }
+//                });
 
                                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             // Handle "Yes" button click
-                                            // Code to save the game
+                                            AlertDialog.Builder nameBuilder = new AlertDialog.Builder(v.getContext());
+                                            nameBuilder.setTitle("Save Game");
+                                            nameBuilder.setMessage("\nEnter game name");
+
+                                            final EditText input = new EditText(nameBuilder.getContext());
+                                            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.MATCH_PARENT);
+                                            //lp.setMargins(convertDpToPx(100), 0, convertDpToPx(48), 0); // Add left margin of 24dp
+                                            input.setLayoutParams(lp);
+
+                                            // Add padding to the EditText
+                                            int paddingDp = 24;
+                                            float density = v.getContext().getResources().getDisplayMetrics().density;
+                                            int paddingPx = (int) (paddingDp * density);
+                                            input.setPadding(paddingPx, paddingPx, paddingPx, (int)(paddingPx/1.5));
+
+// Add a background to the EditText
+                                            //input.setBackgroundResource(R.drawable.edit_text_background);
+
+                                            nameBuilder.setView(input);
+
+                                            nameBuilder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Handle "Save" button click
+                                                    String gameName = input.getText().toString();
+                                                    try{
+                                                        File newFile = new File(getApplicationContext().getFilesDir(),gameName+".txt");
+                                                        newFile.createNewFile();
+                                                        FileWriter fw = new FileWriter(newFile);
+                                                        for(String move : moves)
+                                                            fw.write(move);
+                                                        fw.write("checkmate");
+                                                        fw.write((color.equals("w")?"White":"Black")+"Wins!");
+                                                        newFile.setLastModified(System.currentTimeMillis());
+                                                        fw.close();
+                                                    }
+                                                    catch(IOException e){
+                                                        e.printStackTrace();
+                                                    }
+                                                    Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                                                    startActivity(intent);
+                                                    Toast.makeText(v.getContext(), "Game Saved!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                            nameBuilder.show();
+
                                         }
                                     });
 
-                                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    builder.setNegativeButton("No, Exit!", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             // Handle "No" button click
-                                            dialog.dismiss();
+                                            Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                                            startActivity(intent);
                                         }
                                     });
 
