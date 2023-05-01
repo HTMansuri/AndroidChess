@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import androidx.annotation.Nullable;
+
 /**
  * This is an abstract class that represents a chess board.
  * 
@@ -72,8 +74,22 @@ public abstract class Board
      * @return		a String representing the color of a piece on the board
      */
     public abstract String getColor();
-    
-    
+
+    public static boolean equalsB(Board[][] a, Board[][] b)
+    {
+        for(int i=0; i<7; i++)
+        {
+            for(int j=0; j<7; j++)
+            {
+                if(a[i][j] != b[i][j])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * This is an abstract method that should be implemented to get the name of a piece on the board.
      *

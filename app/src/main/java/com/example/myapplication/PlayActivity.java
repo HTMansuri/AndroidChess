@@ -1,17 +1,12 @@
-//should castling be allowed after undoing it
-//checkmate bug when king can be saved by interference key
-
 package com.example.myapplication;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.*;
 import android.graphics.drawable.*;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,10 +21,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class PlayActivity extends AppCompatActivity
 {
@@ -39,15 +37,15 @@ public class PlayActivity extends AppCompatActivity
     int initialrow, initialcol, clickCount = 0, randid = 1, prevRow, prevCol, currRow, currCol, prevEnPassantRow, prevEnPassantCol;
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
-    String color = "", won = "";
+    String color = "w", won = "";
     int turn = 0, enPassantCheck = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
     boolean check = false, checkMate = false;
     Board finalCache = null, initialCache = null;
-
-    Button undoButton, resignButton, drawButton;
-    List<String> moves = new ArrayList<String>();
+    Button undoButton, resignButton, drawButton, AI;
+    List<String> moves = new ArrayList<>();
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
         turnTV = findViewById(R.id.turn);
@@ -58,11 +56,12 @@ public class PlayActivity extends AppCompatActivity
 
         Chess.initChessBoard(chessboard);
         //debug
-        Chess.displayChessBoard(chessboard);
+        //Chess.displayChessBoard(chessboard);
         undoButton = findViewById(R.id.undo);
         resignButton = findViewById(R.id.resign);
         drawButton = findViewById(R.id.draw);
         undoButton.setAlpha(0.5f);
+
         undoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,14 +138,14 @@ public class PlayActivity extends AppCompatActivity
                         if (chessboard[prevRow][prevCol] instanceof King) {
                             wchecki = prevRow;
                             wcheckj = prevCol;
-                            System.out.println("wchecki: " + wchecki + ", wcheckj: " + wcheckj);
+                            //System.out.println("wchecki: " + wchecki + ", wcheckj: " + wcheckj);
                         }
                         check = Chess.check(chessboard, wchecki, wcheckj);
                     } else {
                         if (chessboard[prevRow][prevCol]!=null && chessboard[prevRow][prevCol] instanceof King) {
                             bchecki = prevRow;
                             bcheckj = prevCol;
-                            System.out.println("bchecki: " + bchecki + ", bcheckj: " + bcheckj);
+                            //System.out.println("bchecki: " + bchecki + ", bcheckj: " + bcheckj);
                         }
                         check = Chess.check(chessboard, bchecki, bcheckj);
                     }
@@ -156,7 +155,7 @@ public class PlayActivity extends AppCompatActivity
                     undoButton.setClickable(false);
                     undoButton.setAlpha(0.5f);
                     //debug
-                    Chess.displayChessBoard(chessboard);
+                    //Chess.displayChessBoard(chessboard);
             }
         });
 
@@ -258,12 +257,12 @@ public class PlayActivity extends AppCompatActivity
                 builder.setMessage("Would you like to save this game ?");
                 //builder.setCancelable(true);
 
-//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                    @Override
-//                    public void onCancel(DialogInterface dialogInterface) {
-//                        // Same as code to "NO"
-//                    }
-//                });
+                //                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                //                    @Override
+                //                    public void onCancel(DialogInterface dialogInterface) {
+                //                        // Same as code to "NO"
+                //                    }
+                //                });
 
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
@@ -286,7 +285,7 @@ public class PlayActivity extends AppCompatActivity
                         int paddingPx = (int) (paddingDp * density);
                         input.setPadding(paddingPx, paddingPx, paddingPx, (int)(paddingPx/1.5));
 
-// Add a background to the EditText
+                        // Add a background to the EditText
                         //input.setBackgroundResource(R.drawable.edit_text_background);
 
                         nameBuilder.setView(input);
@@ -333,11 +332,72 @@ public class PlayActivity extends AppCompatActivity
                 builder.show();
             }
         });
-    }
 
-    private int convertDpToPx(int dp) {
-            float density = getResources().getDisplayMetrics().density;
-            return Math.round(dp * density);
+        //AI
+        AI = findViewById(R.id.ai);
+        AI.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                int ix, iy;
+                ArrayList<ArrayList<Integer>> moves = new ArrayList<>();
+                for(int i = 0; i < 8; i++)
+                {
+                    for(int j = 0; j < 8; j++)
+                    {
+                        if(chessboard[i][j] != null && chessboard[i][j].getColor().equals(color))
+                        {
+                            ArrayList<Integer> move = new ArrayList<>();
+                            move.add(i);
+                            move.add(j);
+                            moves.add(move);
+                        }
+                    }
+                }
+                Collections.shuffle(moves);
+                Board[][] tempBoard = new Board[8][8];
+                for(int i=0; i<8; i++)
+                {
+                    for(int j=0; j<8; j++)
+                    {
+                        tempBoard[i][j] = chessboard[i][j];
+                    }
+                }
+                int sqsize = board.getWidth()/8;
+                int index = 0;
+                while(index < moves.size())
+                {
+                    ix = moves.get(index).get(0) * sqsize;
+                    iy = moves.get(index).get(1) * sqsize;
+
+                    for(int i=0; i<8; i++)
+                    {
+                        for(int j=0; j<8; j++)
+                        {
+                            if(chessboard[i][j] == null || (!chessboard[i][j].getColor().equals(color)))
+                            {
+                                MotionEvent event1 = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, iy, ix,0);
+                                onTouchListener.onTouch(view, event1);
+                                MotionEvent event2 = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, iy, ix,0);
+                                onTouchListener.onTouch(view, event2);
+
+                                MotionEvent event3 = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_DOWN, j*sqsize, i*sqsize,0);
+                                onTouchListener.onTouch(view, event3);
+                                MotionEvent event4 = MotionEvent.obtain(SystemClock.uptimeMillis(), SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, j*sqsize, i*sqsize,0);
+                                onTouchListener.onTouch(view, event4);
+
+                                if(!Board.equalsB(chessboard, tempBoard))
+                                {
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    index++;
+                }
+            }
+        });
     }
 
     View.OnTouchListener onTouchListener = new View.OnTouchListener()
@@ -452,6 +512,7 @@ public class PlayActivity extends AppCompatActivity
                             }
 
                             //Here we check for the situation where the move of a player can lead its own king to be in Check.
+                            check = false;
                             String c = "";
                             if(chessboard[row][col]!=null)
 				                c = chessboard[row][col].getColor();
@@ -623,12 +684,13 @@ public class PlayActivity extends AppCompatActivity
                                 }
                                 chessboard[row][col].setColor(color);
                                 chessboard[initialrow][initialcol] = null;
-                                System.out.println(chessboard[row][col].getUIName() + " " + randid);
+                                //System.out.println(chessboard[row][col].getUIName() + " " + randid);
                                 idUI.put(chessboard[row][col].getUIName(), randid);
                                 initialImageView.setId(randid);
                             }
 
                             //Here we check for Check or CheckMate to the opponent player.
+                            check = false;
                             if(c.equals("b"))
                             {
                                 check = Chess.check(chessboard, wchecki, wcheckj);
@@ -664,12 +726,12 @@ public class PlayActivity extends AppCompatActivity
                                     builder.setMessage("Would you like to save this game ?");
                                     //builder.setCancelable(true);
 
-//                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-//                    @Override
-//                    public void onCancel(DialogInterface dialogInterface) {
-//                        // Same as code to "NO"
-//                    }
-//                });
+                                    //                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                                    //                    @Override
+                                    //                    public void onCancel(DialogInterface dialogInterface) {
+                                    //                        // Same as code to "NO"
+                                    //                    }
+                                    //                });
 
                                     builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                         @Override
@@ -692,7 +754,7 @@ public class PlayActivity extends AppCompatActivity
                                             int paddingPx = (int) (paddingDp * density);
                                             input.setPadding(paddingPx, paddingPx, paddingPx, (int)(paddingPx/1.5));
 
-// Add a background to the EditText
+                                            // Add a background to the EditText
                                             //input.setBackgroundResource(R.drawable.edit_text_background);
 
                                             nameBuilder.setView(input);
@@ -751,8 +813,8 @@ public class PlayActivity extends AppCompatActivity
                             finalImageView = null;
 
                             //debug
-                            System.out.println("\n");
-                            Chess.displayChessBoard(chessboard);
+                            //System.out.println("\n");
+                            //Chess.displayChessBoard(chessboard);
                         }
                         else
                         {

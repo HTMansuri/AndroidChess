@@ -3,17 +3,12 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.widget.ListViewAutoScrollHelper;
-import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -22,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 public class PlayBackHomeActivity extends AppCompatActivity {
@@ -53,7 +47,7 @@ public class PlayBackHomeActivity extends AppCompatActivity {
         savedGames.setVerticalScrollBarEnabled(true);
         savedGames.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        System.out.println(adapter.getCount());
+        //System.out.println(adapter.getCount());
 
         Button sortByName = findViewById(R.id.sortByName);
         Button sortByDate = findViewById(R.id.sortByDate);

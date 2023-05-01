@@ -8,14 +8,13 @@
     android:background="@color/black"
     tools:context=".PlayBackHomeActivity">
 
-
     <TextView
         android:id="@+id/welcomeText"
         android:layout_width="191dp"
         android:layout_height="39dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:text="Game PlayBack's:"
         android:textColor="#FFA500"
         android:textSize="22sp"
@@ -29,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="60dp"
         android:backgroundTint="#FFFFFF"
         android:text="Sort By Date"
         android:textColor="#00008B"
@@ -45,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="60dp"
         android:backgroundTint="#FFFFFF"
         android:text="Sort By Name"
         android:textColor="#00008B"
@@ -57,8 +56,8 @@
 
     <ListView
         android:id="@+id/savedList"
-        android:layout_width="401dp"
-        android:layout_height="605dp"
+        android:layout_width="361dp"
+        android:layout_height="343dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="140dp"
@@ -67,11 +66,12 @@
         android:divider="@android:color/black"
         android:dividerHeight="1dp"
         android:nestedScrollingEnabled="true"
-        android:scrollbarSize="3dp"
+        android:scrollbarSize="20dp"
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
         android:scrollingCache="true"
         android:smoothScrollbar="true"
+        android:fadeScrollbars="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
