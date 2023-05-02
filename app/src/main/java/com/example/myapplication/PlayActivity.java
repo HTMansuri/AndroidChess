@@ -439,6 +439,41 @@ public class PlayActivity extends AppCompatActivity
 
             switch(event.getAction())
             {
+//                case MotionEvent.ACTION_UP:
+//                {
+//                    check = false;
+//                    String c = color;
+//                    if(c.equals("w"))
+//                    {
+//                        check = Chess.check(chessboard, wchecki, wcheckj);
+//                    }
+//                    else
+//                    {
+//                        check = Chess.check(chessboard, bchecki, bcheckj);
+//                    }
+//                    if(check)
+//                    {
+//                        chessboard[row][col] = finalCache;
+//                        chessboard[initialrow][initialcol] = initialCache;
+//                        if(chessboard[initialrow][initialcol].getName().equals("K"))
+//                        {
+//                            if(chessboard[initialrow][initialcol].getColor().equals("w"))
+//                            {
+//                                wchecki = initialrow;
+//                                wcheckj = initialcol;
+//                            }
+//                            else if(chessboard[initialrow][initialcol].getColor().equals("b"))
+//                            {
+//                                bchecki = initialrow;
+//                                bcheckj = initialcol;
+//                            }
+//                        }
+//                        messageTV.setText("Illegal move, try again!!!");
+//                        finalImageView = null;
+//                        initialImageView = null;
+//                        return true;
+//                    }
+//                }
                 case MotionEvent.ACTION_DOWN:
                 {
                     messageTV.setText("");
@@ -462,10 +497,10 @@ public class PlayActivity extends AppCompatActivity
                         || chessboard[row][col] instanceof Knight || chessboard[row][col] instanceof Pawn
                         || chessboard[row][col] instanceof Queen || chessboard[row][col] instanceof Rook))
                     {
-                        if(check)
-                        {
-                            messageTV.setText("Check");
-                        }
+//                        if(check)
+//                        {
+//                            messageTV.setText("Check");
+//                        }
                         clickCount++;
                         initialrow = row;
                         initialcol = col;
@@ -511,7 +546,7 @@ public class PlayActivity extends AppCompatActivity
                             }
                             prevFinObj = chessboard[row][col];
                             chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
-
+                            chessboard[initialrow][initialcol] = null;
                             //keeps track of i and j for check identification
                             if(chessboard[row][col].getName().equals("K"))
                             {
@@ -538,10 +573,10 @@ public class PlayActivity extends AppCompatActivity
                             {
                                 check = Chess.check(chessboard, bchecki, bcheckj);
                             }
+                            chessboard[initialrow][initialcol] = initialCache;
                             if(check)
                             {
                                 chessboard[row][col] = finalCache;
-                                chessboard[initialrow][initialcol] = initialCache;
                                 if(chessboard[initialrow][initialcol].getName().equals("K"))
                                 {
                                     if(chessboard[initialrow][initialcol].getColor().equals("w"))
@@ -635,6 +670,7 @@ public class PlayActivity extends AppCompatActivity
                             //castling
                             if(!check)
                             {
+                                chessboard[initialrow][initialcol] = initialCache;
                                 String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
                                 if (nm != null)
                                 {
@@ -704,6 +740,7 @@ public class PlayActivity extends AppCompatActivity
                                 idUI.put(chessboard[row][col].getUIName(), randid);
                                 initialImageView.setId(randid);
                             }
+                            chessboard[initialrow][initialcol] = null;
 
                             //Here we check for Check or CheckMate to the opponent player.
                             check = false;
@@ -824,6 +861,7 @@ public class PlayActivity extends AppCompatActivity
 
                             chessboard[initialrow][initialcol] = null;
                             turn++;
+                            Chess.displayChessBoard(chessboard);
                             moves.add(move);
                             initialImageView = null;
                             finalImageView = null;
