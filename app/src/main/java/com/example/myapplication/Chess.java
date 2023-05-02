@@ -124,13 +124,23 @@ public class Chess
 						// region of code to check if we can defend by killing the check giving piece or by bringing the piece in between.
 						int iChange = 0;
 						int jChange = 0;
-						int x = i, y=j;
+						int x = i, y = j;
+//						System.out.println("x: "+x);
+//						System.out.println("y: "+y);
+//						System.out.println("kingi: "+kingi);
+//						System.out.println("kingj: "+kingj);
+//						System.out.println("i: "+i);
+//						System.out.println("j: "+j);
+//						System.out.println("iChange: "+iChange);
+						//System.out.println("jChange: "+jChange);
 						if(x-kingi != 0)
 							iChange = (kingi-x)/Math.abs(x-kingi);
 						if(y-kingj!=0)
 							jChange = (kingj-y)/Math.abs(y-kingj);
-						while(x!=kingi && y!=kingj)
+						while(!(x==kingi && y==kingj))
 						{
+							System.out.println("x: "+x);
+							System.out.println("y: "+y);
 							if(reachHere(board,x,y,color))
 							{
 								checkMate = false;

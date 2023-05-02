@@ -512,17 +512,19 @@ public class PlayActivity extends AppCompatActivity
                             }
 
                             //Here we check for the situation where the move of a player can lead its own king to be in Check.
-                            check = false;
-                            String c = "";
-                            if(chessboard[row][col]!=null)
-				                c = chessboard[row][col].getColor();
+                            //check = false;
+                            String c = color;
+//                            if(chessboard[row][col]!=null)
+//				                c = chessboard[row][col].getColor();
                 			if(c.equals("w"))
                             {
                                 check = Chess.check(chessboard, wchecki, wcheckj);
+                                //System.out.println("1 " + check);
                             }
-                            else if(c.equals("b"))
+                            else
                             {
                                 check = Chess.check(chessboard, bchecki, bcheckj);
+                                //System.out.println("2 " + check);
                             }
                             if(check)
                             {
@@ -535,7 +537,7 @@ public class PlayActivity extends AppCompatActivity
                                         wchecki = initialrow;
                                         wcheckj = initialcol;
                                     }
-                                    else
+                                    else if(chessboard[initialrow][initialcol].getColor().equals("b"))
                                     {
                                         bchecki = initialrow;
                                         bcheckj = initialcol;
@@ -690,12 +692,15 @@ public class PlayActivity extends AppCompatActivity
                             }
 
                             //Here we check for Check or CheckMate to the opponent player.
-                            check = false;
+                            //check = false;
+//                            c = "";
+//                            if(chessboard[row][col]!=null)
+//                                c = chessboard[row][col].getColor();
                             if(c.equals("b"))
                             {
                                 check = Chess.check(chessboard, wchecki, wcheckj);
                             }
-                            else if(c.equals("w"))
+                            else
                             {
                                 check = Chess.check(chessboard, bchecki, bcheckj);
                             }
@@ -705,14 +710,14 @@ public class PlayActivity extends AppCompatActivity
                                 messageTV.setText("Check");
                                 if(c.equals("b"))
                                     checkMate = Chess.checkMate(chessboard, wchecki, wcheckj);
-                                else if(c.equals("w"))
+                                else
                                     checkMate = Chess.checkMate(chessboard, bchecki, bcheckj);
 
                                 if(checkMate)
                                 {
                                     if(c.equals("b"))
                                         won = "Black wins";
-                                    else if(c.equals("w"))
+                                    else
                                         won = "White wins";
                                     turnTV.setText(won);
                                     messageTV.setText("Checkmate");
