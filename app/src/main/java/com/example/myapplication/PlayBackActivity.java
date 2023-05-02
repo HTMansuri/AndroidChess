@@ -75,14 +75,12 @@ public class PlayBackActivity extends AppCompatActivity
                 turn++;
                 messageTV.setText("");
                 String move = moves.get(pos);
-                System.out.println(move);
                 if(move.equals("draw") || move.equals("resign") || move.equals("checkmate")){
                     turnTV.setText("Game Over!");
                     messageTV.setText(moves.get(pos+1));
                     turn = -1;
                     next.setClickable(false);
                     next.setAlpha(0.5f);
-                    Chess.displayChessBoard(chessboard);
                     return;
                 }
                 if(turn != -1 && turn%2 != 0)
@@ -180,14 +178,11 @@ public class PlayBackActivity extends AppCompatActivity
                     turn = -1;
                     next.setClickable(false);
                     next.setAlpha(0.5f);
-                    Chess.displayChessBoard(chessboard);
                     return;
                 }
                 if(move.contains("check")){
                     messageTV.setText("Check");
                 }
-
-                Chess.displayChessBoard(chessboard);
                 pos++;
             }
             });

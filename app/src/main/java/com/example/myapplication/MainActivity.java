@@ -15,17 +15,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//
-//        File dataDir = getApplicationContext().getFilesDir();
-//        File[] files = dataDir.listFiles();
-//
-//        if (files != null) {
-//            for (File file : files) {
-//                file.delete();
-//            }
-//        }
-        //get all saved data
-        getData();
 
         //Buttons
         Button newButton = findViewById(R.id.newButton);
@@ -48,15 +37,5 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-    }
-
-    public void getData()
-    {
-
-    }
-
-    public void setData()
-    {
-
     }
 }

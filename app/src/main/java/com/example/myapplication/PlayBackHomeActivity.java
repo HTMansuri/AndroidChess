@@ -47,7 +47,6 @@ public class PlayBackHomeActivity extends AppCompatActivity {
         savedGames.setVerticalScrollBarEnabled(true);
         savedGames.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        //System.out.println(adapter.getCount());
 
         Button sortByName = findViewById(R.id.sortByName);
         Button sortByDate = findViewById(R.id.sortByDate);

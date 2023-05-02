@@ -55,8 +55,6 @@ public class PlayActivity extends AppCompatActivity
         board.setOnTouchListener(onTouchListener);
 
         Chess.initChessBoard(chessboard);
-        //debug
-        Chess.displayChessBoard(chessboard);
         undoButton = findViewById(R.id.undo);
         resignButton = findViewById(R.id.resign);
         drawButton = findViewById(R.id.draw);
@@ -160,14 +158,12 @@ public class PlayActivity extends AppCompatActivity
                         if (chessboard[prevRow][prevCol] instanceof King) {
                             wchecki = prevRow;
                             wcheckj = prevCol;
-                            //System.out.println("wchecki: " + wchecki + ", wcheckj: " + wcheckj);
-                        }
+                            }
                         check = Chess.check(chessboard, wchecki, wcheckj);
                     } else {
                         if (chessboard[prevRow][prevCol]!=null && chessboard[prevRow][prevCol] instanceof King) {
                             bchecki = prevRow;
                             bcheckj = prevCol;
-                            //System.out.println("bchecki: " + bchecki + ", bcheckj: " + bcheckj);
                         }
                         check = Chess.check(chessboard, bchecki, bcheckj);
                     }
@@ -176,8 +172,6 @@ public class PlayActivity extends AppCompatActivity
                     }
                     undoButton.setClickable(false);
                     undoButton.setAlpha(0.5f);
-                    //debug
-                    Chess.displayChessBoard(chessboard);
             }
         });
 
@@ -534,19 +528,15 @@ public class PlayActivity extends AppCompatActivity
                             }
 
                             //Here we check for the situation where the move of a player can lead its own king to be in Check.
-                            //check = false;
+                            check = false;
                             String c = color;
-//                            if(chessboard[row][col]!=null)
-//				                c = chessboard[row][col].getColor();
                 			if(c.equals("w"))
                             {
                                 check = Chess.check(chessboard, wchecki, wcheckj);
-                                //System.out.println("1 " + check);
                             }
                             else
                             {
                                 check = Chess.check(chessboard, bchecki, bcheckj);
-                                //System.out.println("2 " + check);
                             }
                             if(check)
                             {
@@ -711,16 +701,12 @@ public class PlayActivity extends AppCompatActivity
                                 }
                                 chessboard[row][col].setColor(color);
                                 chessboard[initialrow][initialcol] = null;
-                                //System.out.println(chessboard[row][col].getUIName() + " " + randid);
                                 idUI.put(chessboard[row][col].getUIName(), randid);
                                 initialImageView.setId(randid);
                             }
 
                             //Here we check for Check or CheckMate to the opponent player.
-                            //check = false;
-//                            c = "";
-//                            if(chessboard[row][col]!=null)
-//                                c = chessboard[row][col].getColor();
+                            check = false;
                             if(c.equals("b"))
                             {
                                 check = Chess.check(chessboard, wchecki, wcheckj);
@@ -841,10 +827,6 @@ public class PlayActivity extends AppCompatActivity
                             moves.add(move);
                             initialImageView = null;
                             finalImageView = null;
-
-                            //debug
-                            System.out.println("\n");
-                            Chess.displayChessBoard(chessboard);
                         }
                         else
                         {

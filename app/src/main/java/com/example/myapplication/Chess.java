@@ -105,13 +105,6 @@ public class Chess
 										board[kingi - p][kingj - q] = board[kingi][kingj];
 										board[kingi][kingj] = null;
 										check = reachHere(board, kingi - p, kingj - q, color);
-										System.out.println("\nCheck: "+check);
-
-										System.out.println("\nkingi: "+(kingi));
-										System.out.println("\ncolor: "+color);
-										System.out.println("\nkingj: "+(kingj));
-										System.out.println("\nkingi-p: "+(kingi-p));
-										System.out.println("\nkingj-q: "+(kingj-q));
 										board[kingi][kingj] = board[kingi - p][kingj - q];
 										board[kingi - p][kingj - q] = null;
 									}
@@ -120,7 +113,6 @@ public class Chess
 											check = false;
 									}
 										if(!check) {
-											System.out.println("\nHere");
 											checkMate = false;
 											return checkMate;
 										}
@@ -141,22 +133,12 @@ public class Chess
 						int iChange = 0;
 						int jChange = 0;
 						int x = i, y = j;
-//						System.out.println("x: "+x);
-//						System.out.println("y: "+y);
-//						System.out.println("kingi: "+kingi);
-//						System.out.println("kingj: "+kingj);
-//						System.out.println("i: "+i);
-//						System.out.println("j: "+j);
-//						System.out.println("iChange: "+iChange);
-						//System.out.println("jChange: "+jChange);
 						if(x-kingi != 0)
 							iChange = (kingi-x)/Math.abs(x-kingi);
 						if(y-kingj!=0)
 							jChange = (kingj-y)/Math.abs(y-kingj);
 						while(!(x==kingi && y==kingj))
 						{
-							System.out.println("x: "+x);
-							System.out.println("y: "+y);
 							if(reachHere(board,x,y,color))
 							{
 								checkMate = false;
@@ -232,53 +214,6 @@ public class Chess
 				board[i][j] = new Pawn(j+1);
 				board[i][j].setColor("w");
 			}
-		}
-	}
-
-
-	/**
-     * Display current chess board.
-     *
-     * @param board the chess board as a 2D array of Board objects
-     */
-	public static void displayChessBoard(Board[][] board)
-	{
-		int vertIndex = 9;
-		char horiIndex = 'a';
-		for(int i=0; i<=7; i++)
-		{
-			for(int j=0; j<=7; j++)
-			{
-				if(board[i][j] != null)
-				{
-					StringBuilder name = new StringBuilder("");
-					name.append(board[i][j].getColor());
-					name.append(board[i][j].getName());
-					System.out.print(name + " ");
-				}
-				else if((i%2 == 0 && j%2 != 0) || (i%2 != 0 && j%2 == 0))
-				{
-					System.out.print("## ");
-				}
-				else
-				{
-					System.out.print("   ");
-				}
-			}
-			vertIndex--;
-			System.out.println(vertIndex);
-		}
-		while(horiIndex != 'i')
-		{
-			if(horiIndex == 'a')
-			{
-				System.out.print(" " + horiIndex);
-			}
-			else
-			{
-				System.out.print("  " + horiIndex);
-			}
-			horiIndex++;
 		}
 	}
 
