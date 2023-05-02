@@ -544,7 +544,8 @@ public class PlayActivity extends AppCompatActivity
                                 }
                                 finalImageView = findViewById(id);
                             }
-                            prevFinObj = chessboard[row][col];
+                            Board removing = chessboard[row][col];
+                            //prevFinObj = chessboard[row][col];
                             chessboard[row][col] = chessboard[initialrow][initialcol].move(chessboard[row][col]);
                             chessboard[initialrow][initialcol] = null;
                             //keeps track of i and j for check identification
@@ -597,6 +598,7 @@ public class PlayActivity extends AppCompatActivity
                             }
                             else
                             {
+                                prevFinObj = removing;
                                 chessboard[initialrow][initialcol] = initialCache;
                                 params.leftMargin = col * sqsize;
                                 params.topMargin = row * sqsize;
@@ -861,7 +863,6 @@ public class PlayActivity extends AppCompatActivity
 
                             chessboard[initialrow][initialcol] = null;
                             turn++;
-                            //Chess.displayChessBoard(chessboard);
                             moves.add(move);
                             initialImageView = null;
                             finalImageView = null;

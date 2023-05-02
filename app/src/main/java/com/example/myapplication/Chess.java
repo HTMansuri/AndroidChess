@@ -154,47 +154,6 @@ public class Chess
 		return true;
 		}
 
-	public static void displayChessBoard(Board[][] board)
-	{
-			int vertIndex = 9;
-			char horiIndex = 'a';
-			for(int i=0; i<=7; i++)
-				{
-							for(int j=0; j<=7; j++)
-					{
-								if(board[i][j] != null)
-						{
-									StringBuilder name = new StringBuilder("");
-						name.append(board[i][j].getColor());
-						name.append(board[i][j].getName());
-						System.out.print(name + " ");
-					}
-					else if((i%2 == 0 && j%2 != 0) || (i%2 != 0 && j%2 == 0))
-						{
-									System.out.print("## ");
-					}
-					else
-					{
-								System.out.print("   ");
-					}
-				}
-				vertIndex--;
-				System.out.println(vertIndex);
-			}
-			while(horiIndex != 'i')
-				{
-							if(horiIndex == 'a')
-					{
-								System.out.print(" " + horiIndex);
-				}
-				else
-				{
-							System.out.print("  " + horiIndex);
-				}
-				horiIndex++;
-			}
-		}
-
 	/**
      * Initialize the default/initial Chess Board.
      *
