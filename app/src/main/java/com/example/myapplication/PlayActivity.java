@@ -38,8 +38,8 @@ public class PlayActivity extends AppCompatActivity
     TextView turnTV, messageTV;
     HashMap<String, Integer> idUI = new HashMap<>();
     String color = "w", won = "";
-    int turn = 0, enPassantCheck = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3;
-    boolean check = false, checkMate = false;
+    int turn = 0, enPassantCheck = 0, wchecki = 7, wcheckj = 4, bchecki = 0, bcheckj = 4, queenblackPromo = 3, queenwhitePromo = 3, pawnwhitePromo=9, pawnblackPromo=9;
+    boolean check = false, checkMate = false, prevPromotion;
     Board finalCache = null, initialCache = null;
     Button undoButton, resignButton, drawButton, AI;
     List<String> moves = new ArrayList<>();
@@ -56,7 +56,7 @@ public class PlayActivity extends AppCompatActivity
 
         Chess.initChessBoard(chessboard);
         //debug
-        //Chess.displayChessBoard(chessboard);
+        Chess.displayChessBoard(chessboard);
         undoButton = findViewById(R.id.undo);
         resignButton = findViewById(R.id.resign);
         drawButton = findViewById(R.id.draw);
@@ -77,6 +77,28 @@ public class PlayActivity extends AppCompatActivity
                         params.leftMargin = prevCol * sqsize;
                         params.topMargin = prevRow * sqsize;
                         parent.removeView(prevInitObjImg);
+                        if(prevPromotion){
+                            if(chessboard[prevRow][prevCol].getColor().equals("w")) {
+                                chessboard[prevRow][prevCol] = new Pawn(pawnwhitePromo++);
+                                chessboard[prevRow][prevCol].setColor("w");
+                                prevInitObjImg.setImageResource(R.drawable.whitepawn);
+                            }
+                            else{
+                                chessboard[prevRow][prevCol] = new Pawn(pawnblackPromo++);
+                                chessboard[prevRow][prevCol].setColor("b");
+                                prevInitObjImg.setImageResource(R.drawable.blackpawn);
+                            }
+
+                            randid++;
+                            ImageView iv = findViewById(randid);
+                            while(iv != null)
+                            {
+                                randid++;
+                                iv = findViewById(randid);
+                            }
+                            idUI.put(chessboard[prevRow][prevCol].getUIName(), randid);
+                            prevInitObjImg.setId(randid);
+                        }
                         playLayout.addView(prevInitObjImg, params);
                     }
                     if (prevFinObjImg != null) {
@@ -155,7 +177,7 @@ public class PlayActivity extends AppCompatActivity
                     undoButton.setClickable(false);
                     undoButton.setAlpha(0.5f);
                     //debug
-                    //Chess.displayChessBoard(chessboard);
+                    Chess.displayChessBoard(chessboard);
             }
         });
 
@@ -426,14 +448,14 @@ public class PlayActivity extends AppCompatActivity
                 case MotionEvent.ACTION_DOWN:
                 {
                     messageTV.setText("");
-                    if(turn == -1)
-                    {
-                        turnTV.setText(won);
-                        messageTV.setText("Checkmate");
-                        // after buttons are done - check if i need to disable them here
-                        return true;
-                    }
-                    if(initialImageView != null && chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
+//                    if(turn == -1)
+//                    {
+//                        turnTV.setText(won);
+//                        messageTV.setText("Checkmate");
+//                        // after buttons are done - check if i need to disable them here
+//                        return true;
+//                    }
+                   if(initialImageView != null && chessboard[row][col] != null && chessboard[row][col].getColor().equals(color))
                     {
                         initialImageView.setBackground(null);
                         initialImageView = null;
@@ -564,6 +586,7 @@ public class PlayActivity extends AppCompatActivity
                                 prevCastledRookImg = null;
                                 prevEnPassantPawn = null;
                                 prevEnPassantPawnImg = null;
+                                prevPromotion = false;
                                 if(chessboard[row][col] != null)
                                 {
                                     prevFinObjImg = finalImageView;
@@ -669,12 +692,14 @@ public class PlayActivity extends AppCompatActivity
                                 {
                                     chessboard[row][col] = new Queen(queenblackPromo++);
                                     initialImageView.setImageResource(R.drawable.blackqueen);
+                                    prevPromotion = true;
                                     move += " promotion";
                                 }
                                 else
                                 {
                                     chessboard[row][col] = new Queen(queenwhitePromo++);
                                     initialImageView.setImageResource(R.drawable.whitequeen);
+                                    prevPromotion = true;
                                     move += " promotion";
                                 }
                                 randid++;
@@ -818,8 +843,8 @@ public class PlayActivity extends AppCompatActivity
                             finalImageView = null;
 
                             //debug
-                            //System.out.println("\n");
-                            //Chess.displayChessBoard(chessboard);
+                            System.out.println("\n");
+                            Chess.displayChessBoard(chessboard);
                         }
                         else
                         {

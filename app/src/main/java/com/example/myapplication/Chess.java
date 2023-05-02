@@ -99,15 +99,31 @@ public class Chess
 										continue;
 									}
 								else {
+									boolean check = true;
 									if(board[kingi-p][kingj-q]==null)
-										board[kingi-p][kingj-q] = board[kingi][kingj];
-									boolean check = reachHere(board,kingi-p,kingj-q,color);
-									if(board[kingi-p][kingj-q]==board[kingi][kingj])
-										board[kingi-p][kingj-q]=null;
-									if(!check) {
-										checkMate = false;
-										return checkMate;
+									{
+										board[kingi - p][kingj - q] = board[kingi][kingj];
+										board[kingi][kingj] = null;
+										check = reachHere(board, kingi - p, kingj - q, color);
+										System.out.println("\nCheck: "+check);
+
+										System.out.println("\nkingi: "+(kingi));
+										System.out.println("\ncolor: "+color);
+										System.out.println("\nkingj: "+(kingj));
+										System.out.println("\nkingi-p: "+(kingi-p));
+										System.out.println("\nkingj-q: "+(kingj-q));
+										board[kingi][kingj] = board[kingi - p][kingj - q];
+										board[kingi - p][kingj - q] = null;
 									}
+									else{
+										if(board[kingi][kingj].isValid(board,kingi,kingj,kingi-p,kingj-q))
+											check = false;
+									}
+										if(!check) {
+											System.out.println("\nHere");
+											checkMate = false;
+											return checkMate;
+										}
 								}
 							}
 						}
