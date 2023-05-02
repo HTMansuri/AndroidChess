@@ -597,6 +597,7 @@ public class PlayActivity extends AppCompatActivity
                             }
                             else
                             {
+                                chessboard[initialrow][initialcol] = initialCache;
                                 params.leftMargin = col * sqsize;
                                 params.topMargin = row * sqsize;
                                 prevInitObjImg = initialImageView;
@@ -670,7 +671,6 @@ public class PlayActivity extends AppCompatActivity
                             //castling
                             if(!check)
                             {
-                                chessboard[initialrow][initialcol] = initialCache;
                                 String nm = Chess.castling(chessboard, initialrow, initialcol, row, col);
                                 if (nm != null)
                                 {
