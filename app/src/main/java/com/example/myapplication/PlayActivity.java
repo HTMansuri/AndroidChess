@@ -861,7 +861,7 @@ public class PlayActivity extends AppCompatActivity
 
                             chessboard[initialrow][initialcol] = null;
                             turn++;
-                            Chess.displayChessBoard(chessboard);
+                            //Chess.displayChessBoard(chessboard);
                             moves.add(move);
                             initialImageView = null;
                             finalImageView = null;
